@@ -30,6 +30,7 @@
     colours: new Map(), search: "", informationTrigger: null
   }]));
   const maps = {};
+  let analysisDrawer = !mobile.matches;
   const comparisonPageSize = 7;
   const currentMapState = () => mapStates[state.view];
   const currentMap = () => maps[state.view];
@@ -120,14 +121,13 @@
   function renderPanels() {
     const current = currentMapState();
     if (current?.drawer && current.information && !hasRoomForBothPanels()) current.drawer = false;
-    const drawerOpen = Boolean(current?.drawer);
+    const drawerOpen = current ? current.drawer : analysisDrawer;
     const informationOpen = Boolean(current?.information);
     element("atlasWorkspace").classList.toggle("drawer-collapsed", !drawerOpen);
     element("atlasDrawer").inert = !drawerOpen;
     element("mapInformation").hidden = !informationOpen;
     element("mapInformation").inert = !informationOpen;
     element("mapLegend").hidden = informationOpen;
-    element("drawerRailToggle").disabled = !isMap();
     for (const button of panelButtons) {
       button.setAttribute("aria-expanded", button.dataset.panel === "atlasDrawer" ? drawerOpen : informationOpen);
     }
@@ -135,7 +135,15 @@
 
   function setPanel(panel, open) {
     const current = currentMapState();
-    if (!current) return;
+    if (!current) {
+      if (panel !== "atlasDrawer") return;
+      analysisDrawer = open;
+      renderPanels();
+      const focus = open && mobile.matches ? element("onsFilters").querySelector("select") :
+        !open ? element("analysisHeading").querySelector('[data-panel="atlasDrawer"]') : null;
+      focus?.focus({ preventScroll: true });
+      return;
+    }
     if (panel === "atlasDrawer") {
       current.drawer = open;
       if (open && !hasRoomForBothPanels()) current.information = false;
@@ -313,10 +321,12 @@
     element("mapStage").hidden = !isMap();
     element("analysisHeading").hidden = isMap();
     element("onsStage").hidden = isMap();
+    element("onsFilters").hidden = isMap();
+    element("localControls").hidden = !isMap();
     element("chartTitle").textContent = current.title;
     const contentTitle = isMap() ? "mapTitle" : "chartTitle";
     element("mapStage").closest(".content").setAttribute("aria-labelledby", contentTitle);
-    element("drawerTitle").textContent = state.view === "map" ? "Интерактивная карта смертности" : "Медицинские ресурсы по МО";
+    element("drawerTitle").textContent = state.view === "infrastructure" ? "Медицинские ресурсы по МО" : current.title;
     renderPanels();
     if (mobile.matches) current.scrollIntoView({ block: "nearest", inline: "nearest" });
     if (isMap()) {
@@ -336,6 +346,7 @@
     const next = tabs.some(tab => tab.dataset.view === requested) ? requested : "map";
     if (next !== state.view) {
       currentMap()?.deactivate();
+      window.atlasOns.closeDetails();
       state.view = next;
       state.comparisonPage = 0;
     }
@@ -424,6 +435,11 @@
     renderPanels();
     if (isMap()) updateMap();
     renderPagination();
+  });
+  document.addEventListener("keydown", event => {
+    if (!isMap() && analysisDrawer && event.key === "Escape" && !element("onsDetailsDialog").open) {
+      setPanel("atlasDrawer", false);
+    }
   });
   window.addEventListener("resize", () => {
     const current = currentMapState();

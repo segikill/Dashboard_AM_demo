@@ -71,6 +71,7 @@
               <label><input id="showSettlements" type="checkbox"> Населённые пункты</label>
             </fieldset>
           </div>
+          <div class="ons-filters" id="onsFilters" aria-label="Фильтры данных ONS" hidden></div>
         </div>
       </div>
     </aside>
@@ -78,19 +79,25 @@
       <div class="card demo-card">
         <header class="chart-head ons-heading" id="analysisHeading" hidden>
           <div><h2 id="chartTitle"></h2><p>Демонстрационный пример · Англия и Уэльс · 2023–2025</p></div>
-          <a href="https://www.nomisweb.co.uk/datasets/mortsa">Источник ONS / Nomis</a>
+          <div class="ons-heading-actions">
+            <a href="https://www.nomisweb.co.uk/datasets/mortsa">Источник ONS / Nomis</a>
+            <button type="button" data-panel="atlasDrawer" aria-controls="atlasDrawer">Фильтры</button>
+            <button type="button" id="onsOpenDetails" aria-controls="onsDetailsDialog">Сведения</button>
+          </div>
         </header>
         <div id="onsStage" class="ons-stage" hidden>
-          <div class="ons-filters" id="onsFilters" aria-label="Фильтры данных ONS">
-            <label data-filter="year">Год регистрации<select id="onsYear"></select></label>
-            <label data-filter="region">Территория<select id="onsRegion"></select></label>
-            <label data-filter="other">Территория сравнения<select id="onsOther"></select></label>
-            <label data-filter="sex">Пол<select id="onsSex"><option value="0">Все</option><option value="1">Мужчины</option><option value="2">Женщины</option></select></label>
-            <label data-filter="cause">Причина смерти<select id="onsCause"></select></label>
-            <label data-filter="measure">Показатель<select id="onsMeasure"><option value="count">Число смертей</option><option value="share">Доля всех смертей</option><option value="rate">На 100 000, с поправкой на возраст</option></select></label>
+          <div class="ons-workspace">
+            <div class="ons-main">
+              <p id="onsContext" class="ons-context"></p>
+              <div id="onsChart" class="ons-chart"></div>
+              <footer class="ons-attribution">Office for National Statistics © Crown copyright · <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a></footer>
+            </div>
+            <aside id="onsInspector" class="ons-inspector" aria-label="Аналитический контекст" aria-live="polite"></aside>
           </div>
-          <div id="onsChart" class="ons-chart" aria-live="polite"></div>
-          <footer class="ons-attribution">Office for National Statistics © Crown copyright · <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a></footer>
+          <dialog id="onsDetailsDialog" aria-labelledby="onsDetailsTitle">
+            <header><h3 id="onsDetailsTitle">Сведения</h3><form method="dialog"><button type="submit" aria-label="Закрыть сведения" autofocus>×</button></form></header>
+            <div id="onsDetailsBody"></div>
+          </dialog>
         </div>
         <div class="demo-map-stage" id="mapStage">
           <header class="map-workspace-toolbar mortality-map-toolbar">
