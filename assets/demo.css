@@ -27,6 +27,61 @@ body.atlas-demo .atlas-main .demo-card:has(.demo-map-stage:not([hidden])) {
 }
 body.atlas-demo .atlas-main .demo-card .chart-head:not([hidden]) { display: flex; }
 
+.atlas-demo [data-geography="amur"] { --geography-bg: #e3f2f6; --geography-text: #155669; --geography-accent: #83c5d4; }
+.atlas-demo [data-geography="ons"] { --geography-bg: #eee9f7; --geography-text: #513677; --geography-accent: #c4afe2; }
+body.atlas-demo .viz-rail .viz-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.atlas-demo .demo-nav-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 3px;
+  border: 1px solid #a8c4d438;
+  border-radius: 8px;
+}
+.atlas-demo .demo-nav-group:has(.viz-btn.active) { border-color: var(--geography-accent); }
+.atlas-demo .demo-nav-group[data-geography="amur"] { flex: 1 0 auto; }
+.atlas-demo .demo-nav-group[data-geography="ons"] { flex: 3 0 auto; }
+.atlas-demo .demo-nav-group__title {
+  margin: 0;
+  padding: 4px 2px;
+  color: var(--geography-accent);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
+}
+.atlas-demo .demo-nav-group__tabs { display: flex; flex: 1; flex-direction: column; gap: 2px; }
+body.atlas-demo .viz-rail .demo-nav-group .viz-btn {
+  flex: 1 0 45px;
+  gap: 3px;
+  min-width: 0;
+  padding: 4px 0;
+}
+.atlas-demo .demo-view-heading { display: grid; align-content: center; min-width: 0; gap: 4px; }
+body.atlas-demo .demo-geography {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: var(--geography-bg);
+  color: var(--geography-text);
+}
+body.atlas-demo .demo-geography :is(strong, span) {
+  color: inherit;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
 .atlas-demo .demo-map-stage {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -220,6 +275,16 @@ body.atlas-demo .map-workspace-legend:not([hidden]) {
   body.atlas-demo .atlas-main .hero { flex-wrap: nowrap; }
   body.atlas-demo .atlas-main .hero h1 { white-space: normal; }
   body.atlas-demo .atlas-main .app-header-context { flex: 0 0 auto; }
+  body.atlas-demo .atlas-main .viz-rail { scroll-padding-inline-start: 72px; }
+  body.atlas-demo .viz-rail .viz-nav {
+    flex-direction: row;
+    width: auto;
+    overflow: visible;
+  }
+  .atlas-demo .demo-nav-group { padding: 2px 3px; }
+  .atlas-demo .demo-nav-group__title { position: sticky; left: 72px; width: max-content; padding: 1px 4px 2px; white-space: nowrap; }
+  .atlas-demo .demo-nav-group__tabs { flex-direction: row; align-items: stretch; }
+  body.atlas-demo .viz-rail .demo-nav-group .viz-btn { flex: 0 0 80px; height: auto; }
   .atlas-demo .map-workspace-toolbar { min-height: 52px; padding: 6px 8px; }
   .atlas-demo .map-workspace-toolbar__heading { flex-basis: 100%; }
   .atlas-demo .map-workspace-toolbar .demo-settings-button { display: none; }

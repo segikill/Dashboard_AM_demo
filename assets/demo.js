@@ -306,7 +306,7 @@
     }
     currentMapState().colours = colours;
     element("mapTitle").textContent = indicator.label;
-    element("mapUnit").textContent = "Амурская область · " + period + " · " + indicator.unit + " · " + coverage + " из " + municipalities.length + " МО";
+    element("mapUnit").textContent = period + " · " + indicator.unit + " · " + coverage + " из " + municipalities.length + " МО";
     element("legendUnit").textContent = indicator.unit;
     element("metricSource").textContent = "Сборник «Здоровье и здравоохранение Амурской области», стр. " + indicator.page + ".";
     element("metricNote").textContent = indicator.note ?? "";
@@ -329,7 +329,9 @@
 
   function renderView() {
     const current = tabs.find(tab => tab.dataset.view === state.view);
+    const geography = current.closest("[data-geography]");
     document.body.dataset.shellView = state.view;
+    document.title = current.title + " · " + geography.querySelector(".demo-nav-group__title").textContent + " · Атлас";
     for (const tab of tabs) {
       tab.classList.toggle("active", tab === current);
       tab.setAttribute("aria-pressed", tab === current);
