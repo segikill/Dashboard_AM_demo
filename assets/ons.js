@@ -20,7 +20,7 @@
   const blocks = classes.flatMap(cause => children(cause.id));
   const codes = blocks.flatMap(cause => children(cause.id));
   const yearOptions = data.years.map(year => [String(year), String(year)]);
-  const years = [["all", "2023–2025"], ...yearOptions];
+  const years = [["all", "2023–2025 (всего)"], ...yearOptions];
   const sexes = [["0", "Оба пола"], ["1", "Мужчины"], ["2", "Женщины"]];
   const sexLabels = new Map(sexes);
   const ageOptions = data.ages.map((age, i) => [String(i), age]);
@@ -62,7 +62,7 @@
     const n = count(slice, cause);
     return metric === "share" ? ratio(n, count(slice, "0")) : n;
   };
-  const periodLabel = year => year === "all" ? "2023–2025" : year;
+  const periodLabel = year => year === "all" ? "2023–2025 (всего)" : year;
   const summary = (slice, { region = true, year = true, sex = true, age = true } = {}) =>
     [year && periodLabel(slice.year), region && regionById.get(slice.region), sex && sexLabels.get(slice.sex), age && data.ages[slice.age]].filter(Boolean).join(" · ");
   const levelCauses = settings => {
@@ -486,7 +486,7 @@
       register(key, { title: region.name + " · " + cause.code, context: causeLabel(cause) + " · " + summary(slice, { region: false }),
         fields: [["Значение", format(amount)], ["Смертей по причине", num(count(slice, cause.id))],
           ["Всего смертей", num(count(slice, "0"))], ["Место территории", rank == null ? "Нет данных" : rank + " из " + across.length],
-          ["Место причины", causeRank == null ? "Нет данных" : causeRank + " из " + values.filter(Number.isFinite).length]],
+          ["Место среди причин матрицы", causeRank == null ? "Нет данных" : causeRank + " из " + values.filter(Number.isFinite).length]],
         related: across.slice(0, 4).map(item => item.name + " · " + format(item.value)) });
       const cell = pickButton(key, format(amount), "ons-heat-cell");
       cell.setAttribute("aria-label", region.name + " · " + causeLabel(cause) + " · " + format(amount));
@@ -583,7 +583,7 @@
       label.style.borderColor = colour;
       return [label, ...entries];
     });
-    chart.append(note("Ранг рассчитывается внутри показанных причин каждого среза. Одинаковые значения получают одинаковое место."),
+    chart.append(note("Ранг рассчитывается среди причин выбранного уровня до отбора топа. При равных значениях ранг совпадает."),
       plot, table("Ранги причин", ["Причина", ...groups.map(([name]) => name)], body, "ons-rank-table"));
   }
 
@@ -748,7 +748,8 @@
     const reference = rows.find(row => row.id === filters.region);
     const other = rows.find(row => row.id === s.other);
     chart.append(node("h3", causeLabel(cause)), note(measure === "rate" ?
-      "Возраст-стандартизованный коэффициент ONS на 100 000 жителей, европейское стандартное население 2013 года." :
+      "Стандартизованный по возрасту коэффициент ONS на 100 000 жителей за один год и для всех возрастов. Стандарт — европейское население 2013 года." +
+        (filters.year === "all" ? " Для периода 2023–2025 показан коэффициент за 2025 год." : "") :
       measure === "share" ? "Доля причины среди всех зарегистрированных смертей на каждой территории." : "Число зарегистрированных смертей."));
     chart.append(table("Выбранные территории", ["Территория", "Значение"], [reference, other].map(row => [
       pickButton(row.id, row.name, "ons-row-button"), format(row.amount)
@@ -794,6 +795,8 @@
     chart.replaceChildren();
     items.clear();
     renderers[view]();
+    if (filters.age === "1" && ["treemap", "heatmap", "arrow", "dotogram"].includes(view) &&
+        (view !== "dotogram" || s.measure !== "rate" && s.cause !== "0")) chart.prepend(note(ageNotice));
     if (!items.has(selections.get(view))) selections.set(view, view === "dotogram" ? filters.region : items.keys().next().value);
     updateSelection();
     const next = chart.querySelector(".ons-matrix")?.parentElement;

@@ -292,7 +292,7 @@
     }
     currentMapState().colours = colours;
     element("mapTitle").textContent = indicator.label;
-    element("mapUnit").textContent = "Данные сборника · " + period + " · " + indicator.unit + " · " + coverage + " из " + municipalities.length + " МО";
+    element("mapUnit").textContent = "Амурская область · " + period + " · " + indicator.unit + " · " + coverage + " из " + municipalities.length + " МО";
     element("legendUnit").textContent = indicator.unit;
     element("metricSource").textContent = "Сборник «Здоровье и здравоохранение Амурской области», стр. " + indicator.page + ".";
     const limits = indicator.breaks.map((limit, index) =>
