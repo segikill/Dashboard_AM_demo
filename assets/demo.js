@@ -7,7 +7,6 @@
   const tabs = [...navigation.querySelectorAll("[data-view]")];
   const panelButtons = [...document.querySelectorAll("[data-panel]")];
   const mobile = matchMedia("(max-width: 1023px)");
-  const svgNamespace = "http://www.w3.org/2000/svg";
   const format = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
   const display = value => value == null ? "Нет данных" : format.format(value);
   const years = [2023, 2024, 2025];
@@ -21,29 +20,22 @@
   const settlementById = new Map(settlements.map(item => [item.id, item]));
   const state = {
     view: "map",
-    drawer: !mobile.matches,
-    information: !mobile.matches,
-    settlements: false,
-    territory: "region",
-    settlement: null,
     mortalityYear: 2025,
     resourceYear: 2025,
     resource: data.indicators[1].id,
-    comparisonPage: 0,
-    zoom: 1
+    comparisonPage: 0
   };
-  const districtNodes = new Map();
-  const pointNodes = new Map();
+  const mapStates = Object.fromEntries(["map", "infrastructure"].map(view => [view, {
+    drawer: !mobile.matches, information: false, settlements: false, selected: "region",
+    colours: new Map(), search: "", informationTrigger: null
+  }]));
+  const maps = {};
   const comparisonPageSize = 7;
-
-  function svg(tag, attributes = {}) {
-    const node = document.createElementNS(svgNamespace, tag);
-    for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
-    return node;
-  }
+  const currentMapState = () => mapStates[state.view];
+  const currentMap = () => maps[state.view];
 
   function isMap() {
-    return state.view === "map" || state.view === "infrastructure";
+    return Boolean(currentMapState());
   }
 
   function year() {
@@ -78,33 +70,63 @@
     addOption(settlementOptions, item.id, item.name + " · " + display(item.population) + " чел.");
   }
 
-  for (const { id, path } of data.territories) {
-    const district = svg("path", { d: path, class: "demo-district", "fill-rule": "evenodd" });
-    district.dataset.territory = id;
-    district.append(svg("title"));
-    district.addEventListener("click", () => selectTerritory(id, true));
-    element("districts").append(district);
-    districtNodes.set(id, district);
+  function selectableItems() {
+    return currentMapState().settlements ? [...municipalities, ...settlements] : municipalities;
   }
 
-  for (const item of [...settlements].sort((a, b) => a.population - b.population)) {
-    const radius = Math.min(9, 2.1 + 0.85 * Math.log10(Math.max(1, item.population)));
-    const point = svg("circle", { cx: item.x, cy: item.y, r: radius, class: "demo-settlement" });
-    point.dataset.settlement = item.id;
-    const title = svg("title");
-    title.textContent = item.name + " · " + display(item.population) + " чел.";
-    point.append(title);
-    point.addEventListener("click", () => selectTerritory(item.id, true));
-    element("settlementPoints").append(point);
-    pointNodes.set(item.id, point);
+  function mapContainer(view) {
+    return element(view === "map" ? "mortalityMap" : "medicalMap");
+  }
+
+  function activateMap() {
+    const view = state.view;
+    element("mortalityMap").hidden = view !== "map";
+    element("medicalMap").hidden = view !== "infrastructure";
+    element("mapError").hidden = true;
+    if (currentMap()) return;
+    try {
+      maps[view] = window.atlasDemoMap.create(mapContainer(view), {
+        isActive: () => state.view === view,
+        hideCard: () => mapStates[view].information || (mobile.matches && mapStates[view].drawer),
+        items: selectableItems,
+        card: territoryCardData,
+        select: selectTerritory,
+        openInformation: () => setPanel("mapInformation", true),
+        escape: () => {
+          const current = currentMapState();
+          if (current.information) setPanel("mapInformation", false);
+          else if (mobile.matches && current.drawer) setPanel("atlasDrawer", false);
+          else return false;
+          return true;
+        }
+      });
+    } catch (error) {
+      element("mapError").textContent = "Не удалось открыть карту. Сведения доступны через список территорий.";
+      element("mapError").hidden = false;
+      console.warn("Map unavailable:", error);
+    }
+  }
+
+  function updateMap(options) {
+    const { colours, selected, settlements } = currentMapState();
+    currentMap()?.update({ colours, selected, settlements }, options);
+  }
+
+  function hasRoomForBothPanels() {
+    return innerWidth - (document.querySelector(".viz-rail").getBoundingClientRect().width || 80) >= 1380 &&
+      !mobile.matches;
   }
 
   function renderPanels() {
-    const drawerOpen = isMap() && state.drawer;
-    const informationOpen = isMap() && state.information;
+    const current = currentMapState();
+    if (current?.drawer && current.information && !hasRoomForBothPanels()) current.drawer = false;
+    const drawerOpen = Boolean(current?.drawer);
+    const informationOpen = Boolean(current?.information);
     element("atlasWorkspace").classList.toggle("drawer-collapsed", !drawerOpen);
     element("atlasDrawer").inert = !drawerOpen;
     element("mapInformation").hidden = !informationOpen;
+    element("mapInformation").inert = !informationOpen;
+    element("mapLegend").hidden = informationOpen;
     element("drawerRailToggle").disabled = !isMap();
     for (const button of panelButtons) {
       button.setAttribute("aria-expanded", button.dataset.panel === "atlasDrawer" ? drawerOpen : informationOpen);
@@ -112,46 +134,51 @@
   }
 
   function setPanel(panel, open) {
+    const current = currentMapState();
+    if (!current) return;
     if (panel === "atlasDrawer") {
-      state.drawer = open;
-      if (open && mobile.matches) state.information = false;
+      current.drawer = open;
+      if (open && !hasRoomForBothPanels()) current.information = false;
     } else {
-      state.information = open;
-      if (open && mobile.matches) state.drawer = false;
+      current.information = open;
+      if (open) {
+        current.informationTrigger = document.activeElement;
+        if (!hasRoomForBothPanels()) current.drawer = false;
+      }
     }
     renderPanels();
+    currentMap()?.resize();
+    updateMap();
+    if (panel === "mapInformation") {
+      const trigger = current.informationTrigger;
+      const fallback = element("mapStage").querySelector('.map-workspace-toolbar [data-panel="mapInformation"]');
+      const target = open ? element("mapInformationTitle") :
+        trigger !== document.body && trigger?.getClientRects().length ? trigger : fallback;
+      target?.focus({ preventScroll: true });
+    } else if (!open && mobile.matches) {
+      element("drawerRailToggle").focus({ preventScroll: true });
+    }
   }
 
-  function selectTerritory(id, fromMap = false) {
-    pointNodes.get(state.settlement)?.classList.remove("is-selected");
-    const settlement = settlementById.get(id);
-    if (settlement) {
-      state.settlement = id;
-      pointNodes.get(id).classList.add("is-selected");
-    } else {
-      state.settlement = null;
-      state.territory = id;
-    }
+  function selectTerritory(id, { fly = false, focus = false } = {}) {
+    const current = currentMapState();
+    if (!current || !names.has(id) && (!current.settlements || !settlementById.has(id))) return;
+    current.selected = id;
+    if (fly && mobile.matches && current.drawer) setPanel("atlasDrawer", false);
     renderTerritory();
     for (const button of element("comparison").querySelectorAll("[data-territory]")) {
-      if (!settlement && button.dataset.territory === id) button.setAttribute("aria-current", "true");
+      if (button.dataset.territory === id) button.setAttribute("aria-current", "true");
       else button.removeAttribute("aria-current");
     }
-    if (fromMap) {
-      setPanel("mapInformation", true);
-      if (mobile.matches) element("territoryDetails").focus({ preventScroll: true });
-    }
+    updateMap({ focus });
+    if (fly) currentMap()?.focusFeature(id);
   }
 
-  function renderTerritory() {
+  function territoryCardData(id) {
     const indicator = metric();
     const period = year();
-    const settlement = settlementById.get(state.settlement);
-    const id = state.territory;
-    const value = getValue(indicator, id, period);
-    element("territory").value = state.settlement ?? id;
-    element("outline").setAttribute("d", settlement ? "" : districtNodes.get(id)?.getAttribute("d") ?? "");
-    const card = settlement ? {
+    const settlement = settlementById.get(id);
+    return settlement ? {
       name: settlement.name,
       context: censusContext,
       value: settlement.population,
@@ -160,15 +187,23 @@
     } : {
       name: names.get(id),
       context: String(period),
-      value,
+      value: getValue(indicator, id, period),
       unit: indicator.unit,
       label: indicator.label,
       footer: id === "region" ? null : { label: "По области", value: display(getValue(indicator, "region", period)) }
     };
-    element("territoryDetails").innerHTML = territoryCard.render(card);
-    element("annualSeries").hidden = Boolean(settlement);
-    element("medicalComparison").hidden = state.view !== "infrastructure" || Boolean(settlement);
-    if (settlement) return;
+  }
+
+  function renderTerritory() {
+    const indicator = metric();
+    const period = year();
+    const id = currentMapState().selected;
+    const isSettlement = settlementById.has(id);
+    element("territory").value = id;
+    element("territoryDetails").innerHTML = territoryCard.render(territoryCardData(id));
+    element("annualSeries").hidden = isSettlement;
+    element("medicalComparison").hidden = state.view !== "infrastructure" || isSettlement;
+    if (isSettlement) return;
     element("series").replaceChildren(...years.map(item => {
       const cell = document.createElement("div");
       cell.classList.toggle("is-current", item === period);
@@ -182,25 +217,11 @@
   }
 
   function renderSettlements() {
-    element("settlementPoints").toggleAttribute("hidden", !state.settlements);
-    element("populationLegend").hidden = !state.settlements;
-    element("showSettlements").checked = state.settlements;
-    if (state.settlements) element("territory").append(settlementOptions);
+    const show = currentMapState().settlements;
+    element("populationLegend").hidden = !show;
+    element("showSettlements").checked = show;
+    if (show) element("territory").append(settlementOptions);
     else settlementOptions.remove();
-  }
-
-  function renderZoom() {
-    const bounds = districtNodes.get(state.territory)?.getBBox();
-    const settlement = settlementById.get(state.settlement);
-    const width = 660 / state.zoom;
-    const height = 600 / state.zoom;
-    const centerX = settlement?.x ?? (bounds ? bounds.x + bounds.width / 2 : 330);
-    const centerY = settlement?.y ?? (bounds ? bounds.y + bounds.height / 2 : 300);
-    const x = Math.min(660 - width, Math.max(0, centerX - width / 2));
-    const y = Math.min(600 - height, Math.max(0, centerY - height / 2));
-    element("map").setAttribute("viewBox", [x, y, width, height].join(" "));
-    element("zoomIn").disabled = state.zoom === 3;
-    element("zoomOut").disabled = state.zoom === 1;
   }
 
   function renderMedicalComparison(indicator, period) {
@@ -214,11 +235,11 @@
       const number = document.createElement("strong");
       button.type = "button";
       button.dataset.territory = row.id;
-      if (row.id === state.territory) button.setAttribute("aria-current", "true");
+      if (row.id === currentMapState().selected) button.setAttribute("aria-current", "true");
       label.textContent = row.name;
       number.textContent = display(row.value);
       button.append(label, number);
-      button.addEventListener("click", () => selectTerritory(row.id));
+      button.addEventListener("click", () => selectTerritory(row.id, { fly: true }));
       listItem.append(button);
       return listItem;
     }));
@@ -254,13 +275,14 @@
     if (focusYear) element("years").querySelector('[aria-pressed="true"]')?.focus();
 
     let coverage = 0;
-    for (const [id, district] of districtNodes) {
+    const colours = new Map();
+    for (const { id } of municipalities) {
       const value = getValue(indicator, id, period);
       const bin = indicator.breaks.findIndex(limit => value <= limit);
       if (value !== null) coverage += 1;
-      district.style.fill = value === null ? missing : palette[bin < 0 ? palette.length - 1 : bin];
-      district.firstElementChild.textContent = names.get(id) + " · " + display(value);
+      colours.set(id, value === null ? missing : palette[bin < 0 ? palette.length - 1 : bin]);
     }
+    currentMapState().colours = colours;
     element("mapTitle").textContent = indicator.label;
     element("mapUnit").textContent = "Данные сборника · " + period + " · " + indicator.unit + " · " + coverage + " из " + municipalities.length + " МО";
     element("legendUnit").textContent = indicator.unit;
@@ -278,6 +300,7 @@
     }));
     renderTerritory();
     renderMedicalComparison(indicator, period);
+    updateMap();
   }
 
   function renderView() {
@@ -297,9 +320,12 @@
     renderPanels();
     if (mobile.matches) current.scrollIntoView({ block: "nearest", inline: "nearest" });
     if (isMap()) {
+      activateMap();
+      element("mapSearchInput").value = currentMapState().search;
+      element("mapSearchMessage").textContent = "";
       renderSettlements();
       renderMetric();
-      renderZoom();
+      currentMap()?.resize();
     } else {
       window.atlasOns.show(state.view);
     }
@@ -307,11 +333,11 @@
 
   function syncView() {
     const requested = location.hash.slice(1);
-    state.view = tabs.some(tab => tab.dataset.view === requested) ? requested : "map";
-    state.comparisonPage = 0;
-    if (mobile.matches) {
-      state.drawer = false;
-      state.information = false;
+    const next = tabs.some(tab => tab.dataset.view === requested) ? requested : "map";
+    if (next !== state.view) {
+      currentMap()?.deactivate();
+      state.view = next;
+      state.comparisonPage = 0;
     }
     renderView();
   }
@@ -351,26 +377,40 @@
     renderMetric();
   });
   element("showSettlements").addEventListener("change", event => {
-    state.settlements = event.target.checked;
-    if (!state.settlements && state.settlement) selectTerritory(state.territory);
+    const current = currentMapState();
+    current.settlements = event.target.checked;
     renderSettlements();
+    if (!current.settlements && settlementById.has(current.selected)) selectTerritory("region");
+    else updateMap();
   });
   element("territory").addEventListener("change", event => {
-    selectTerritory(event.target.value, true);
-    renderZoom();
+    selectTerritory(event.target.value, { fly: true, focus: true });
   });
-  element("resetMap").addEventListener("click", () => {
-    selectTerritory("region");
-    state.zoom = 1;
-    renderZoom();
+  element("resetMap").addEventListener("click", () => currentMap()?.fitRegion());
+
+  const normalizeSearch = value => value.trim().toLocaleLowerCase("ru").replaceAll("ё", "е").replace(/\s+/g, " ");
+  const searchInput = element("mapSearchInput");
+  const searchMessage = element("mapSearchMessage");
+  searchInput.addEventListener("input", () => {
+    currentMapState().search = searchInput.value;
+    searchMessage.textContent = "";
   });
-  element("zoomIn").addEventListener("click", () => {
-    state.zoom = Math.min(3, state.zoom * 1.5);
-    renderZoom();
-  });
-  element("zoomOut").addEventListener("click", () => {
-    state.zoom = Math.max(1, state.zoom / 1.5);
-    renderZoom();
+  element("mapSearch").addEventListener("submit", event => {
+    event.preventDefault();
+    const query = normalizeSearch(searchInput.value);
+    if (!query) return;
+    const items = selectableItems();
+    const exact = items.filter(item => normalizeSearch(item.name) === query);
+    const matches = exact.length ? exact : items.filter(item => normalizeSearch(item.name).includes(query));
+    if (matches.length !== 1) {
+      searchMessage.textContent = matches.length ? "Уточните название территории. Найдено несколько совпадений." : "Территория не найдена.";
+      return;
+    }
+    const [item] = matches;
+    currentMapState().search = item.name;
+    searchInput.value = item.name;
+    searchMessage.textContent = "";
+    selectTerritory(item.id, { fly: true, focus: true });
   });
   element("previous").addEventListener("click", () => {
     state.comparisonPage -= 1;
@@ -381,10 +421,13 @@
     renderPagination();
   });
   mobile.addEventListener("change", () => {
-    state.drawer = !mobile.matches;
-    state.information = !mobile.matches;
     renderPanels();
+    if (isMap()) updateMap();
     renderPagination();
+  });
+  window.addEventListener("resize", () => {
+    const current = currentMapState();
+    if (current?.drawer && current.information && !hasRoomForBothPanels()) renderPanels();
   });
   window.addEventListener("hashchange", syncView);
   syncView();
