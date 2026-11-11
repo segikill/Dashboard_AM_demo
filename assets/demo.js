@@ -16,17 +16,21 @@
   const territoryCard = window.AmurTerritoryCard;
   const municipalities = [...data.territories].sort((a, b) => a.name.localeCompare(b.name, "ru"));
   const names = new Map([["region", "Амурская область"], ...municipalities.map(({ id, name }) => [id, name])]);
-  const settlements = data.settlements.map((item, index) => ({ ...item, id: "s" + index }));
+  const settlements = window.atlasAmurMapData.settlements.features.map(({ properties }) => ({
+    id: properties.key, name: properties.name, population: properties.population2021
+  }));
   const settlementById = new Map(settlements.map(item => [item.id, item]));
+  const indicators = {
+    map: data.indicators.filter(item => item.id === "deaths_rate" || item.view === "map"),
+    infrastructure: data.indicators.filter(item => item.id !== "deaths_rate" && item.view !== "map")
+  };
   const state = {
     view: "map",
-    mortalityYear: 2025,
-    resourceYear: 2025,
-    resource: data.indicators[1].id,
     comparisonPage: 0
   };
-  const mapStates = Object.fromEntries(["map", "infrastructure"].map(view => [view, {
+  const mapStates = Object.fromEntries(Object.keys(indicators).map(view => [view, {
     drawer: !mobile.matches, information: false, settlements: false, selected: "region",
+    year: 2025, indicator: indicators[view][0].id, labels: "auto",
     colours: new Map(), search: "", informationTrigger: null
   }]));
   const maps = {};
@@ -40,12 +44,11 @@
   }
 
   function year() {
-    return state.view === "map" ? state.mortalityYear : state.resourceYear;
+    return currentMapState().year;
   }
 
   function metric() {
-    if (state.view === "map") return data.indicators[0];
-    return data.indicators.find(indicator => indicator.id === state.resource);
+    return indicators[state.view].find(indicator => indicator.id === currentMapState().indicator);
   }
 
   function getValue(indicator, id, period) {
@@ -56,9 +59,6 @@
     select.append(new Option(label, value));
   }
 
-  for (const indicator of data.indicators.slice(1)) {
-    addOption(element("indicator"), indicator.id, indicator.label);
-  }
   addOption(element("territory"), "region", names.get("region"));
   const municipalityOptions = document.createElement("optgroup");
   municipalityOptions.label = "Муниципальные образования";
@@ -68,7 +68,21 @@
   const settlementOptions = document.createElement("optgroup");
   settlementOptions.label = "Населённые пункты";
   for (const item of [...settlements].sort((a, b) => a.name.localeCompare(b.name, "ru"))) {
-    addOption(settlementOptions, item.id, item.name + " · " + display(item.population) + " чел.");
+    const count = item.population == null ? "нет данных о населении" : display(item.population) + " чел.";
+    addOption(settlementOptions, item.id, item.name + " · " + count);
+  }
+  const populationClasses = window.AmurDemoMapSymbols.classes;
+  const missingPopulation = { label: "Нет данных", diameter: 6, missing: true };
+  for (const { diameter, ring, label, missing } of [...populationClasses, missingPopulation]) {
+    const entry = document.createElement("li");
+    const symbol = document.createElement("i");
+    symbol.style.setProperty("--symbol-size", Math.round(diameter / 2) + "px");
+    symbol.style.setProperty("--symbol-ring", ring ? Math.round(ring / 2) + "px" : "1px");
+    symbol.classList.toggle("is-ring", Boolean(ring));
+    symbol.classList.toggle("is-missing", Boolean(missing));
+    symbol.setAttribute("aria-hidden", "true");
+    entry.append(symbol, document.createTextNode(label));
+    element("populationClasses").append(entry);
   }
 
   function selectableItems() {
@@ -87,15 +101,16 @@
     if (currentMap()) return;
     try {
       maps[view] = window.atlasDemoMap.create(mapContainer(view), {
+        medical: view === "infrastructure",
         isActive: () => state.view === view,
-        hideCard: () => mapStates[view].information || (mobile.matches && mapStates[view].drawer),
+        hideCard: () => !mobile.matches || mapStates[view].information || mapStates[view].drawer,
         items: selectableItems,
         card: territoryCardData,
         select: selectTerritory,
         openInformation: () => setPanel("mapInformation", true),
         escape: () => {
           const current = currentMapState();
-          if (current.information) setPanel("mapInformation", false);
+          if (mobile.matches && current.information) setPanel("mapInformation", false);
           else if (mobile.matches && current.drawer) setPanel("atlasDrawer", false);
           else return false;
           return true;
@@ -109,20 +124,15 @@
   }
 
   function updateMap(options) {
-    const { colours, selected, settlements } = currentMapState();
-    currentMap()?.update({ colours, selected, settlements }, options);
-  }
-
-  function hasRoomForBothPanels() {
-    return innerWidth - (document.querySelector(".viz-rail").getBoundingClientRect().width || 80) >= 1380 &&
-      !mobile.matches;
+    const { colours, selected, settlements, labels } = currentMapState();
+    currentMap()?.update({ colours, selected, settlements, labels }, options);
   }
 
   function renderPanels() {
     const current = currentMapState();
-    if (current?.drawer && current.information && !hasRoomForBothPanels()) current.drawer = false;
+    if (mobile.matches && current?.drawer && current.information) current.drawer = false;
     const drawerOpen = current ? current.drawer : analysisDrawer;
-    const informationOpen = Boolean(current?.information);
+    const informationOpen = Boolean(current && (!mobile.matches || current.information));
     element("atlasWorkspace").classList.toggle("drawer-collapsed", !drawerOpen);
     element("atlasDrawer").inert = !drawerOpen;
     element("mapInformation").hidden = !informationOpen;
@@ -146,12 +156,13 @@
     }
     if (panel === "atlasDrawer") {
       current.drawer = open;
-      if (open && !hasRoomForBothPanels()) current.information = false;
+      if (open && mobile.matches) current.information = false;
     } else {
+      if (!mobile.matches) return;
       current.information = open;
       if (open) {
         current.informationTrigger = document.activeElement;
-        if (!hasRoomForBothPanels()) current.drawer = false;
+        current.drawer = false;
       }
     }
     renderPanels();
@@ -208,9 +219,13 @@
     const id = currentMapState().selected;
     const isSettlement = settlementById.has(id);
     element("territory").value = id;
-    element("territoryDetails").innerHTML = territoryCard.render(territoryCardData(id));
+    const card = territoryCardData(id);
+    element("territoryDetails").innerHTML = territoryCard.render(card);
+    element("mapMobileValue").textContent = display(card.value);
+    element("mapMobileValue").closest("button").setAttribute("aria-label",
+      "Статистика. " + card.name + " · " + display(card.value) + (card.value == null ? "" : " " + card.unit));
     element("annualSeries").hidden = isSettlement;
-    element("medicalComparison").hidden = state.view !== "infrastructure" || isSettlement;
+    element("medicalComparison").hidden = isSettlement;
     if (isSettlement) return;
     element("series").replaceChildren(...years.map(item => {
       const cell = document.createElement("div");
@@ -228,12 +243,12 @@
     const show = currentMapState().settlements;
     element("populationLegend").hidden = !show;
     element("showSettlements").checked = show;
+    element("mapLabels").value = currentMapState().labels;
     if (show) element("territory").append(settlementOptions);
     else settlementOptions.remove();
   }
 
-  function renderMedicalComparison(indicator, period) {
-    if (state.view !== "infrastructure") return;
+  function renderComparison(indicator, period) {
     const rows = municipalities.map(({ id, name }) => ({ id, name, value: getValue(indicator, id, period) }));
     rows.sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
     element("comparison").replaceChildren(...rows.map(row => {
@@ -269,8 +284,7 @@
     const indicator = metric();
     const period = year();
     const focusYear = document.activeElement?.dataset.year != null;
-    element("indicatorField").hidden = state.view === "map";
-    element("indicator").value = state.resource;
+    element("indicator").value = indicator.id;
     element("years").style.gridTemplateColumns = "repeat(" + indicator.years.length + ", minmax(0, 1fr))";
     element("years").replaceChildren(...indicator.years.map(item => {
       const button = document.createElement("button");
@@ -295,6 +309,8 @@
     element("mapUnit").textContent = "Амурская область · " + period + " · " + indicator.unit + " · " + coverage + " из " + municipalities.length + " МО";
     element("legendUnit").textContent = indicator.unit;
     element("metricSource").textContent = "Сборник «Здоровье и здравоохранение Амурской области», стр. " + indicator.page + ".";
+    element("metricNote").textContent = indicator.note ?? "";
+    element("metricNote").hidden = !indicator.note;
     const limits = indicator.breaks.map((limit, index) =>
       index === 0 ? "≤ " + display(limit) : "> " + display(indicator.breaks[index - 1]) + " – " + display(limit)
     );
@@ -307,7 +323,7 @@
       return entry;
     }));
     renderTerritory();
-    renderMedicalComparison(indicator, period);
+    renderComparison(indicator, period);
     updateMap();
   }
 
@@ -333,6 +349,9 @@
       activateMap();
       element("mapSearchInput").value = currentMapState().search;
       element("mapSearchMessage").textContent = "";
+      const select = element("indicator");
+      select.replaceChildren();
+      for (const indicator of indicators[state.view]) addOption(select, indicator.id, indicator.label);
       renderSettlements();
       renderMetric();
       currentMap()?.resize();
@@ -375,15 +394,15 @@
   }
   element("years").addEventListener("click", event => {
     if (!event.target.dataset.year) return;
-    if (state.view === "map") state.mortalityYear = Number(event.target.dataset.year);
-    else state.resourceYear = Number(event.target.dataset.year);
+    currentMapState().year = Number(event.target.dataset.year);
     state.comparisonPage = 0;
     renderMetric();
   });
   element("indicator").addEventListener("change", event => {
-    state.resource = event.target.value;
+    const current = currentMapState();
+    current.indicator = event.target.value;
     const supported = metric().years;
-    if (!supported.includes(state.resourceYear)) state.resourceYear = supported.at(-1);
+    if (!supported.includes(current.year)) current.year = supported.at(-1);
     state.comparisonPage = 0;
     renderMetric();
   });
@@ -393,6 +412,10 @@
     renderSettlements();
     if (!current.settlements && settlementById.has(current.selected)) selectTerritory("region");
     else updateMap();
+  });
+  element("mapLabels").addEventListener("change", event => {
+    currentMapState().labels = event.target.value;
+    updateMap();
   });
   element("territory").addEventListener("change", event => {
     selectTerritory(event.target.value, { fly: true, focus: true });
@@ -440,10 +463,6 @@
     if (!isMap() && analysisDrawer && event.key === "Escape" && !element("onsDetailsDialog").open) {
       setPanel("atlasDrawer", false);
     }
-  });
-  window.addEventListener("resize", () => {
-    const current = currentMapState();
-    if (current?.drawer && current.information && !hasRoomForBothPanels()) renderPanels();
   });
   window.addEventListener("hashchange", syncView);
   syncView();

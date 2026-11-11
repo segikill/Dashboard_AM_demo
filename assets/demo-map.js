@@ -1,7 +1,8 @@
 (() => {
   "use strict";
 
-  const { municipalities, settlements } = window.atlasAmurMapData;
+  const { municipalities, municipalityLabels, settlements } = window.atlasAmurMapData;
+  const symbols = window.AmurDemoMapSymbols;
   const features = [...municipalities.features, ...settlements.features];
   const byKey = new Map(features.map(feature => [feature.properties.key, feature]));
   const byId = new Map(features.map(feature => [feature.id, feature.properties.key]));
@@ -10,7 +11,6 @@
   const fill = "amur-municipality-fill";
   const outline = "amur-municipality-outline";
   const selectedOutline = "amur-municipality-selected";
-  const points = "amur-settlement-points";
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
   function extendBounds(bounds, geometry) {
@@ -20,6 +20,7 @@
   }
 
   function create(container, options) {
+    const { medical } = options;
     const { Map, LngLatBounds, NavigationControl, ScaleControl, Popup } = window.maplibregl;
     const region = municipalities.features.reduce((bounds, { geometry }) => extendBounds(bounds, geometry), new LngLatBounds());
     const map = new Map({
@@ -35,6 +36,7 @@
       maxZoom: 15.5,
       pitchWithRotate: false,
       attributionControl: false,
+      fadeDuration: 0,
       locale: {
         "NavigationControl.ZoomIn": "Увеличить масштаб",
         "NavigationControl.ZoomOut": "Уменьшить масштаб",
@@ -51,7 +53,7 @@
     let ready = false;
     let fitPending = true;
     let hovered = null;
-    let model = { colours: new window.Map(), selected: "region", settlements: false };
+    let model = { colours: new window.Map(), selected: "region", settlements: false, labels: "auto" };
     let pendingFocus = null;
 
     function clearHover() {
@@ -84,11 +86,8 @@
       }
       const feature = byKey.get(model.selected);
       map.setFilter(selectedOutline, ["==", ["id"], feature?.geometry.type === "Point" ? -1 : feature?.id ?? -1]);
-      map.setPaintProperty(points, "circle-stroke-color",
-        ["case", ["==", ["id"], feature?.id ?? -1], "#ffdb86", "#ffffff"]);
-      map.setPaintProperty(points, "circle-stroke-width",
-        ["case", ["==", ["id"], feature?.id ?? -1], 2.5, 1.2]);
-      map.setLayoutProperty(points, "visibility", model.settlements ? "visible" : "none");
+      symbols.update(map, { settlements: model.settlements, labels: model.labels, medical,
+        selection: feature?.geometry.type === "Point" ? feature.id : null });
     }
 
     function fitRegion(animate = true) {
@@ -125,7 +124,7 @@
 
     function hit(point) {
       if (!ready) return null;
-      const layers = model.settlements ? [points, fill] : [fill];
+      const layers = model.settlements ? [...symbols.pointIds, fill] : [fill];
       return map.queryRenderedFeatures(point, { layers })[0]?.properties.key ?? null;
     }
 
@@ -145,14 +144,23 @@
         filter: ["==", ["id"], -1],
         paint: { "line-color": "#16394e", "line-width": 2.5 }
       });
-      map.addLayer({
-        id: points, source: settlementSource, type: "circle",
-        layout: { "circle-sort-key": ["get", "population"] },
-        paint: {
-          "circle-radius": ["interpolate", ["linear"], ["get", "population"], 0, 3, 1000, 4.5, 10000, 6, 250000, 9],
-          "circle-color": "#135e79"
-        }
-      });
+      symbols.addLayers(map, settlementSource, medical);
+      if (medical) {
+        const source = "amur-municipality-labels";
+        map.addSource(source, { type: "geojson", data: municipalityLabels });
+        map.addLayer({
+          id: source, source, type: "symbol", minzoom: 8.35,
+          layout: {
+            "text-field": ["get", "name"],
+            "text-font": ["Noto Sans Regular"],
+            "text-size": 11.5,
+            "text-max-width": 10,
+            "text-allow-overlap": false
+          },
+          paint: { "text-color": "#52677c", "text-halo-color": "rgba(255,255,255,.88)", "text-halo-width": 1.2 }
+        });
+      }
+      symbols.addLabels(map, settlementSource, medical);
       ready = true;
       paint();
       fitRegion(false);

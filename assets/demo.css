@@ -121,7 +121,7 @@ body.atlas-demo .map-workspace-legend:not([hidden]) {
 }
 .atlas-demo .map-workspace-information.demo-information {
   display: flex;
-  width: 300px;
+  width: clamp(232px, 22vw, 300px);
   min-width: 0;
   min-height: 0;
   flex-direction: column;
@@ -149,17 +149,27 @@ body.atlas-demo .map-workspace-legend:not([hidden]) {
 .atlas-demo .demo-series :is(dt, dd) { text-align: center; }
 .atlas-demo .demo-legend-list,
 .atlas-demo .demo-comparison-list { margin: 0; padding: 0; list-style: none; }
-.atlas-demo .demo-legend-list li,
-.atlas-demo .demo-population-legend { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.atlas-demo .demo-legend-list li { display: flex; align-items: center; gap: 6px; font-size: 11px; }
 .atlas-demo .demo-legend-list li + li { margin-top: 4px; }
-.atlas-demo .demo-legend-list li span,
-.atlas-demo .demo-population-legend span {
+.atlas-demo .demo-legend-list li span {
   flex: 0 0 12px;
   height: 12px;
   border: 1px solid #6d8996;
   border-radius: 2px;
 }
-.atlas-demo .demo-population-legend span { background: #135e79; border-radius: 50%; }
+.atlas-demo .demo-population-legend { margin-top: 14px; }
+.atlas-demo .demo-population-legend ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 10px; margin: 0; padding: 0; list-style: none; }
+.atlas-demo .demo-population-legend li { display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: 4px; min-height: 23px; font-size: 11px; }
+.atlas-demo .demo-population-legend i {
+  justify-self: center;
+  width: var(--symbol-size);
+  height: var(--symbol-size);
+  border: 1px solid #324b62;
+  border-radius: 50%;
+  background: #6daeba;
+}
+.atlas-demo .demo-population-legend i.is-ring { border: var(--symbol-ring) solid #3f8693; background: #fff; }
+.atlas-demo .demo-population-legend i.is-missing { border-color: #63758a; background: #fff; }
 .atlas-demo #medicalComparison { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--app-line); }
 .atlas-demo #medicalComparison summary { cursor: pointer; font-weight: 600; }
 .atlas-demo .demo-comparison-list button {
@@ -195,6 +205,16 @@ body.atlas-demo .map-workspace-legend:not([hidden]) {
 }
 .atlas-demo .viz-rail button:focus-visible { outline-color: #b9d7ef; }
 
+@media (min-width: 1024px) {
+  body.atlas-demo .demo-mobile-statistics { display: none; }
+  .atlas-demo #territoryDetails {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #fff;
+  }
+}
+
 @media (max-width: 1023px) {
   body.atlas-demo .atlas-main { grid-template-rows: auto 0 minmax(0, 1fr); }
   body.atlas-demo .atlas-main .hero { flex-wrap: nowrap; }
@@ -206,6 +226,7 @@ body.atlas-demo .map-workspace-legend:not([hidden]) {
   .atlas-demo .map-workspace-toolbar .map-workspace-title span { overflow-wrap: anywhere; }
   .atlas-demo .map-workspace-toolbar button { min-height: 44px; }
   .atlas-demo .map-workspace-toolbar__actions { justify-content: flex-start; }
+  .atlas-demo .demo-mobile-statistics strong { font-weight: 600; font-variant-numeric: tabular-nums; }
   .atlas-demo .map-workspace-search { display: flex; flex: 1 1 100%; }
   .atlas-demo .map-workspace-search input { flex: 1; width: auto; height: 44px; font-size: 16px; }
   .atlas-demo .demo-map-canvas .maplibregl-ctrl-group button { width: 44px; height: 44px; }
