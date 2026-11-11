@@ -12,7 +12,10 @@
   <link rel="stylesheet" href="assets/map-workspace.css">
   <link rel="stylesheet" href="assets/territory-card.css">
   <link rel="stylesheet" href="assets/demo.css">
+  <link rel="stylesheet" href="assets/ons.css">
   <script defer src="assets/territory-card.js"></script>
+  <script defer src="assets/ons-data.js"></script>
+  <script defer src="assets/ons.js"></script>
   <script defer src="assets/demo.js"></script>
 </head>
 <body class="site-observatory app-interface-v2 hybrid-ui map-workspace-desktop atlas-demo" data-region="amur" data-shell-view="map">
@@ -68,8 +71,22 @@
     </aside>
     <section class="content" aria-labelledby="chartTitle">
       <div class="card demo-card">
-        <header class="chart-head" id="analysisHeading" hidden><div><h2 id="chartTitle"></h2></div></header>
-        <div id="analysisEmpty" class="demo-empty" hidden>Данные для демонстрации пока не подключены</div>
+        <header class="chart-head ons-heading" id="analysisHeading" hidden>
+          <div><h2 id="chartTitle"></h2><p>Демонстрационный пример · Англия и Уэльс · 2023–2025</p></div>
+          <a href="https://www.nomisweb.co.uk/datasets/mortsa">Источник ONS / Nomis</a>
+        </header>
+        <div id="onsStage" class="ons-stage" hidden>
+          <div class="ons-filters" id="onsFilters" aria-label="Фильтры данных ONS">
+            <label data-filter="year">Год регистрации<select id="onsYear"></select></label>
+            <label data-filter="region">Территория<select id="onsRegion"></select></label>
+            <label data-filter="other">Территория сравнения<select id="onsOther"></select></label>
+            <label data-filter="sex">Пол<select id="onsSex"><option value="0">Все</option><option value="1">Мужчины</option><option value="2">Женщины</option></select></label>
+            <label data-filter="cause">Причина смерти<select id="onsCause"></select></label>
+            <label data-filter="measure">Показатель<select id="onsMeasure"><option value="count">Число смертей</option><option value="share">Доля всех смертей</option><option value="rate">На 100 000, с поправкой на возраст</option></select></label>
+          </div>
+          <div id="onsChart" class="ons-chart" aria-live="polite"></div>
+          <footer class="ons-attribution">Office for National Statistics © Crown copyright · <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a></footer>
+        </div>
         <div class="demo-map-stage" id="mapStage">
           <header class="map-workspace-toolbar mortality-map-toolbar">
             <div class="map-workspace-toolbar__heading">

@@ -289,7 +289,7 @@
     }
     element("mapStage").hidden = !isMap();
     element("analysisHeading").hidden = isMap();
-    element("analysisEmpty").hidden = isMap();
+    element("onsStage").hidden = isMap();
     element("chartTitle").textContent = current.title;
     const contentTitle = isMap() ? "mapTitle" : "chartTitle";
     element("mapStage").closest(".content").setAttribute("aria-labelledby", contentTitle);
@@ -300,6 +300,8 @@
       renderSettlements();
       renderMetric();
       renderZoom();
+    } else {
+      window.atlasOns.show(state.view);
     }
   }
 
