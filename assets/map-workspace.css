@@ -1,0 +1,145 @@
+/* Shared controls. Map data symbols and statistical colour scales keep their meaning. */
+.map-workspace-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0; }
+.map-workspace-toolbar__heading,.map-workspace-toolbar__actions { display:flex; align-items:center; gap:8px; min-width:0; }
+.map-workspace-title { display:grid; min-width:0; gap:3px; }
+.map-workspace-toolbar .map-workspace-title b { color:#19384c; font-size:15px; font-weight:600; white-space:normal; line-height:1.25; }
+.map-workspace-toolbar .map-workspace-title span { color:#5d6f7c; font-size:11px; font-weight:400; letter-spacing:0; text-transform:none; }
+.map-workspace-toolbar button { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:36px; padding:6px 10px; border:1px solid #c3d0da; border-radius:6px; background:#fff; color:#234b66; font:500 12px/1.3 "Segoe UI",Arial,sans-serif; cursor:pointer; white-space:nowrap; }
+.map-workspace-toolbar button[aria-pressed=true] { background:#e7f0f5; border-color:#6995b5; }
+.map-workspace-toolbar button span { font:inherit; letter-spacing:0; text-transform:none; color:inherit; }
+.map-workspace-modes { display:flex; gap:4px; flex-shrink:0; }
+.map-workspace-search { position:relative; display:flex; min-width:0; gap:4px; }
+.map-workspace-search input { width:170px; min-width:0; height:36px; padding:6px 9px; border:1px solid #c3d0da; border-radius:6px; font:12px "Segoe UI",Arial,sans-serif; color:#19384c; background:#fff; }
+.map-workspace-toolbar .map-workspace-search__message { position:absolute; top:calc(100% + 6px); right:0; z-index:20; width:240px; padding:8px; border:1px solid #d4e0e6; border-radius:6px; background:#fff; color:#19384c; font-size:12px; font-weight:400; letter-spacing:0; text-transform:none; box-shadow:0 3px 12px #19384c14; }
+.map-workspace-search__message:empty { display:none; }
+.map-workspace-information,.map-workspace-legend { display:none; }
+.mortality-switch { display:grid; min-width:0; gap:4px; }
+.mortality-switch--period { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.mortality-switch--period button:last-child { grid-column:1/-1; }
+.mortality-switch--quick-period { display:none; }
+.mortality-switch--layer { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.mortality-switch button {
+  min-width:0;
+  min-height:36px;
+  padding:5px 6px;
+  border:1px solid #c3d0da;
+  border-radius:6px;
+  background:#f5f8fa;
+  color:#234b66;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:500;
+  line-height:1.25;
+  text-align:center;
+  cursor:pointer;
+}
+.mortality-switch button[aria-pressed="true"] {
+  border-color:#6995b5;
+  background:#e7f0f5;
+  color:#19384c;
+  font-weight:600;
+}
+.mortality-switch button:focus-visible { outline:2px solid #28679a; outline-offset:1px; }
+@media(min-width:1024px) {
+  .mortality-switch--quick-period { display:flex; flex-wrap:wrap; }
+  .map-workspace-toolbar .mortality-switch--quick-period button { min-height:32px; padding:4px 8px; }
+  body.map-workspace-desktop .atlas-main { --controls-w:280px; }
+  body.map-workspace-desktop:is([data-shell-view="infrastructure"], :has(#atlasDrawer #reactGlobalFilters:not([hidden]))) .atlas-main {
+    grid-template-rows:var(--app-header-h) 0 minmax(0,1fr) !important;
+  }
+  body.map-workspace-desktop .atlas-main .workspace { grid-row:3; }
+  body.map-workspace-desktop .map-workspace-toolbar { flex-wrap:wrap; }
+  body.map-workspace-desktop .map-workspace-toolbar__heading { flex:1 1 220px; }
+  body.map-workspace-desktop .map-workspace-toolbar__actions { flex-wrap:wrap; justify-content:flex-end; }
+  body.map-workspace-desktop:is([data-shell-view="infrastructure"], :has(#atlasDrawer #reactGlobalFilters:not([hidden]))) .global-filterbar {
+    display:none !important;
+  }
+  body.map-workspace-desktop .global-filterbar #reactGlobalFilters .filters {
+    grid-template-columns:minmax(236px,1.15fr) minmax(125px,1fr) minmax(116px,1fr) auto;
+  }
+  .global-filterbar .mortality-switch--period { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .global-filterbar .mortality-switch--period button { min-height:26px; padding:3px; white-space:nowrap; font-size:11px; }
+  .global-filterbar .mortality-switch--period button:last-child { grid-column:auto; }
+  body.map-workspace-desktop #atlasDrawer .drawer-section-title { display:none; }
+  body.map-workspace-desktop #atlasDrawer .drawer-head { min-height:64px; height:64px; background:#fff; }
+  body.map-workspace-desktop #atlasDrawer .drawer-head h2 { font-size:14px; font-weight:600; }
+  body.map-workspace-desktop #atlasDrawer .drawer-head > div > span { display:none; }
+  body.map-workspace-desktop .drawer-scroll { padding:12px 16px; }
+  body.map-workspace-desktop #reactGlobalFilters .filters { display:grid; grid-template-columns:1fr; gap:12px; padding:0 0 16px; border:0; border-bottom:1px solid #d4e0e6; }
+  body.map-workspace-desktop #reactGlobalFilters .field { display:grid; grid-template-columns:1fr; gap:4px; margin:0; padding:0; border:0; background:none; }
+  body.map-workspace-desktop #reactGlobalFilters .field label { display:block; font-size:12px; font-weight:500; }
+  body.map-workspace-desktop #reactGlobalFilters .field select { min-height:36px; padding:7px 9px; font-size:13px; }
+  body.map-workspace-desktop #reactGlobalFilters .seg { width:100%; }
+  body.map-workspace-desktop #reactGlobalFilters .seg button { min-height:36px; font-size:12px; }
+  body.map-workspace-desktop .app-filter-reset { min-height:34px; }
+  body.map-workspace-desktop #localControls { margin:16px 0 0; padding:0; border:0; }
+  body.map-workspace-desktop #localControls > .field { padding:0; margin:0 0 16px; background:none; border:0; border-radius:0; }
+  body.map-workspace-desktop #localControls label { font-size:12px; font-weight:500; }
+  body.map-workspace-desktop #localControls select,body.map-workspace-desktop #localControls input { min-height:36px; font-size:13px; }
+  body.map-workspace-desktop .mortality-map-column { grid-template-rows:auto minmax(0,1fr); }
+  body.map-workspace-desktop .mortality-map-toolbar { min-height:64px; padding:10px 12px; }
+  body.map-workspace-desktop .mortality-map-shell { grid-template-columns:minmax(0,1fr) !important; }
+  body.map-workspace-desktop .mortality-map-side { display:none !important; }
+  body.map-workspace-desktop:is(.shell-inspector-open,:not(.shell-inspector-collapsed)) .mortality-map-shell { grid-template-columns:minmax(0,1fr) 300px !important; }
+  body.map-workspace-desktop:is(.shell-inspector-open,:not(.shell-inspector-collapsed)) .mortality-map-side { position:static !important; display:block !important; width:auto; opacity:1; pointer-events:auto; transform:none; height:100%; overflow:auto; box-shadow:none; }
+  body.map-workspace-desktop .infra-shell { grid-template-columns:280px minmax(0,1fr); }
+  body.map-workspace-desktop .infra-shell.is-panel-collapsed { grid-template-columns:0 minmax(0,1fr); }
+  body.map-workspace-desktop .infra-shell.has-map-information { grid-template-columns:280px minmax(0,1fr) 300px; }
+  body.map-workspace-desktop .infra-shell.has-map-information.is-panel-collapsed { grid-template-columns:0 minmax(0,1fr) 300px; }
+  body.map-workspace-desktop .infra-shell.is-panel-collapsed .infra-layer-composer { display:none; }
+  body.map-workspace-desktop .infra-layer-composer { grid-column:1; grid-row:1; }
+  body.map-workspace-desktop .infra-map-column { display:grid; grid-column:2; grid-row:1; grid-template-rows:auto minmax(0,1fr); min-width:0; }
+  body.map-workspace-desktop .infra-map,
+  body.map-workspace-desktop .infra-map.maplibregl-map { position:relative; inset:auto; grid-row:2; min-height:0; }
+  body.map-workspace-desktop .map-workspace-information { grid-column:3; grid-row:1; }
+  body.map-workspace-desktop .map-workspace-resources .infra-layer-group:has([data-layer-toggle="isochrone20"]) { display:none; }
+  body.map-workspace-desktop .infra-map-toolbar { position:static; display:flex; align-items:center; gap:8px; top:auto; left:auto; right:auto; width:auto; min-height:64px; margin:0; padding:10px 12px; border:0; border-bottom:1px solid #d4e0e6; border-radius:0; box-shadow:none; background:#fff; }
+  body.map-workspace-desktop .infra-panel-head { min-height:64px; height:64px; padding:12px 16px; background:#fff; }
+  body.map-workspace-desktop .infra-panel-head h3 { font-size:14px; font-weight:600; }
+  body.map-workspace-desktop .infra-panel-head span { font-size:11px; font-weight:400; letter-spacing:0; text-transform:none; }
+  body.map-workspace-desktop .medical-resources--infrastructure .resource-mode { display:none; }
+  body.map-workspace-desktop .medical-resources--infrastructure:has(.resource-mode:only-child) { display:none; }
+  body.map-workspace-desktop .infra-map .territory-card-dock { top:16px; max-height:calc(100% - 32px); }
+  body.map-workspace-desktop .infra-map .territory-picker { top:148px; }
+  body.map-workspace-desktop .infra-shell.has-map-information .map-workspace-information { display:flex; flex-direction:column; min-width:0; min-height:0; height:100%; border-left:1px solid #d4e0e6; background:#fff; }
+  .map-workspace-information > header { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:64px; padding:12px 16px; border-bottom:1px solid #d4e0e6; }
+  .map-workspace-information h3 { margin:0; font-size:14px; font-weight:600; color:#19384c; }
+  .map-workspace-information > header button { width:32px; height:32px; flex-shrink:0; border:1px solid #c3d0da; border-radius:6px; background:#fff; color:#234b66; font-size:20px; cursor:pointer; }
+  .map-workspace-information__scroll { overflow:auto; padding:16px; }
+  .map-workspace-information h4 { margin:0 0 8px; font-size:13px; font-weight:600; }
+  .map-workspace-information section + section { margin-top:20px; padding-top:16px; border-top:1px solid #d4e0e6; }
+  .map-workspace-information dl { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; font-size:12px; }
+  .map-workspace-information dt { color:#526674; }
+  .map-workspace-information dd { margin:0; text-align:right; font-weight:600; font-variant-numeric:tabular-nums; }
+  .map-workspace-information dd small { display:block; font-size:11px; font-weight:400; color:#526674; }
+  .map-workspace-note { font-size:11px; line-height:1.45; color:#526674; }
+  .map-workspace-network-selection > b { font-size:24px; font-weight:500; }
+  .map-workspace-resources:not(.has-facility-information) [data-network-information],.infra-shell:not(.map-workspace-resources) [data-resource-information],.infra-shell.has-facility-information [data-resource-information] { display:none; }
+  body.map-workspace-desktop .map-workspace-legend:not([hidden]) { position:absolute; z-index:4; display:grid; gap:4px; left:12px; bottom:44px; width:190px; padding:8px 10px; border:1px solid #c3d0da; border-radius:6px; background:#ffffffef; color:#19384c; text-align:left; cursor:pointer; }
+  .map-workspace-legend b { font-size:12px; font-weight:600; }
+  .map-workspace-legend span,.map-workspace-legend small { font-size:11px; line-height:1.3; }
+  .map-workspace-legend small { color:#526674; }
+  .map-workspace-legend__colors { display:flex; height:6px; overflow:hidden; border-radius:2px; }
+  .map-workspace-legend__colors i { flex:1; }
+  body.map-workspace-desktop .map-workspace-toolbar button:focus-visible,body.map-workspace-desktop .map-workspace-legend:focus-visible { outline:2px solid #28679a; outline-offset:3px; }
+}
+@media(min-width:1024px) and (max-width:1599px) {
+  .map-workspace-toolbar { flex-wrap:wrap; gap:8px; }
+  .map-workspace-toolbar__heading { flex:1 1 240px; }
+  .map-workspace-toolbar__actions { flex:1 1 auto; justify-content:flex-end; }
+  .map-workspace-modes { order:3; }
+  .map-workspace-search input { width:150px; }
+}
+/* Mobile retains the existing touch panels during the desktop-first migration. */
+@media(max-width:1023px) {
+  body.app-interface-v2 .global-filterbar .mortality-period-field { grid-column:1/-1; height:auto; }
+  .mortality-switch button { min-height:44px; }
+  .map-workspace-search,.map-workspace-modes { display:none; }
+  .map-workspace-toolbar { flex-wrap:wrap; gap:8px; }
+  .map-workspace-toolbar__heading { flex:1 1 100%; }
+  .map-workspace-title { flex:1; }
+  .map-workspace-title b { font-size:13px !important; }
+  .map-workspace-toolbar__actions { flex:1; justify-content:space-between; }
+  .react-infra-map-chrome .map-workspace-details { display:none; }
+  .map-workspace-toolbar button { min-height:40px; }
+}

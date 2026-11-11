@@ -1,0 +1,253 @@
+.mobile-tools, .mobile-filter-toggle, .mobile-details-toggle, .mobile-panel-close, .mobile-chart-hint { display: none; }
+.tree-touch-hint { display: none; }
+
+@media (hover: none), (pointer: coarse), (max-width: 1023px) {
+  #tooltip, .mortality-hover-popup, .resource-hover-popup, .infra-cluster-hover-popup { display: none !important; }
+  .tree-pointer-hint { display: none; }
+  .tree-touch-hint { display: inline; }
+}
+html[data-atlas-input="touch"] #tooltip,
+html[data-atlas-input="touch"] :is(.mortality-hover-popup, .resource-hover-popup, .infra-cluster-hover-popup) { display: none !important; }
+
+@media (max-width: 1023px) {
+  body.hybrid-ui { min-width: 0; --mobile-nav-h: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  body.hybrid-ui .atlas-main { grid-template-rows: auto auto minmax(0, 1fr); --controls-w: min(320px, calc(100vw - 12px)); }
+  body.hybrid-ui .atlas-main .hero {
+    grid-row: 1;
+    height: auto;
+    min-height: 60px;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  body.hybrid-ui .app-brand-mark { display: none; }
+  body.hybrid-ui .atlas-main .hero h1 { min-width: 0; max-width: none; flex: 1 1 160px; font-size: 16px; }
+  body.hybrid-ui .app-header-actions { flex: 0 1 auto; gap: 4px; }
+  body.hybrid-ui .app-header-context { order: 3; width: 100%; gap: 4px; flex-wrap: wrap; }
+  body.hybrid-ui .mobile-tools { display: flex; order: 2; width: 100%; gap: 8px; }
+  body.hybrid-ui[data-shell-view="infrastructure"] .mobile-tools { display: none; }
+  body.hybrid-ui .hero :is(.app-header-pill, .app-header-kpi) { padding: 4px; min-height: 26px; }
+  body.hybrid-ui .hero :is(.app-header-pill, .app-header-kpi, .app-header-kpi span) { font-size: 10px; }
+  body.hybrid-ui .hero :is(.app-header-pill b, .app-header-kpi b) { font-size: 11px; }
+  body.hybrid-ui .hero .atlas-actions button { padding: 4px 6px; font-size: 11px; }
+  body.hybrid-ui .mobile-filter-toggle, body.hybrid-ui .mobile-details-toggle {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border: 1px solid #87a1b4;
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    font: 500 12px/1.3 "Segoe UI", Arial, sans-serif;
+  }
+  body.hybrid-ui .mobile-details-toggle { display: none; }
+  body.hybrid-ui:is([data-shell-view="treemap"], [data-shell-view="heatmap"]) .mobile-details-toggle { display: inline-flex; }
+  body.hybrid-ui[data-shell-view="infrastructure"] .mobile-filter-toggle { display: none; }
+  body.hybrid-ui .global-filterbar { grid-row: 2; height: auto; padding: 8px; }
+  body.hybrid-ui .global-filterbar::before { display: none; }
+  body.hybrid-ui .global-filterbar .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  body.hybrid-ui .global-filterbar .field { grid-template-columns: minmax(0, 1fr); height: auto; padding: 4px; gap: 4px; }
+  body.hybrid-ui .global-filterbar .field label { font-size: 11px; padding-left: 4px; }
+  body.hybrid-ui .global-filterbar .field select { padding-left: 4px; font-size: 12px; }
+  body.hybrid-ui .global-filterbar .field .seg button { font-size: 12px; }
+  body.hybrid-ui .global-filterbar .atlas-search { display: none; }
+  body.hybrid-ui .global-filterbar .app-filter-reset { height: 100%; min-height: 44px; }
+  body.hybrid-ui.mobile-filters-hidden .global-filterbar,
+  body.hybrid-ui[data-shell-view="infrastructure"] .global-filterbar { display: none !important; }
+  body.hybrid-ui .atlas-main .workspace,
+  body.hybrid-ui .atlas-main .workspace.drawer-collapsed {
+    position: relative;
+    grid-row: 3;
+    grid-template-columns: minmax(0, 1fr);
+    padding-bottom: var(--mobile-nav-h);
+    transition: none;
+  }
+  body.hybrid-ui .atlas-main .workspace .content {
+    grid-column: 1 / -1;
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.hybrid-ui .atlas-main .workspace .sidebar {
+    position: absolute;
+    z-index: 80;
+    inset: 0 auto var(--mobile-nav-h) 0;
+    height: auto;
+    width: var(--controls-w);
+    box-shadow: 6px 0 20px #18334630;
+  }
+  body.hybrid-ui .workspace.drawer-collapsed .sidebar { visibility: hidden; }
+  body.hybrid-ui .atlas-main .viz-rail {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 200;
+    width: 100%;
+    height: var(--mobile-nav-h);
+    padding: 4px;
+    padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-top: 1px solid #698496;
+    scrollbar-width: thin;
+  }
+  body.hybrid-ui :is(.react-navigation-rail-host, .react-navigation-rail) {
+    width: max-content;
+    min-width: 100%;
+    height: 100%;
+    flex: 0 0 auto;
+    flex-direction: row;
+  }
+  body.hybrid-ui .viz-rail .rail-drawer-toggle {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 64px;
+    min-width: 64px;
+    height: 100%;
+    margin: 0 4px 0 0;
+    flex-direction: column;
+    background: var(--app-navy);
+  }
+  body.hybrid-ui .viz-rail .rail-drawer-toggle small { display: block; font-size: 11px; }
+  body.hybrid-ui .viz-rail .viz-nav { display: flex; width: auto; flex: 0 0 auto; gap: 4px; }
+  body.hybrid-ui .viz-rail .viz-btn { width: 80px; height: 100%; flex: 0 0 80px; padding: 4px; }
+  body.hybrid-ui .viz-rail .viz-btn--analysis-start::after { display: none; }
+  body.hybrid-ui .chart-head { gap: 8px; padding: 8px; }
+  body.hybrid-ui .chart-head h2 { font-size: 15px; }
+  body.hybrid-ui .chart-head > div:first-child { min-width: 150px; }
+  body.hybrid-ui .hybrid-chart-actions { gap: 4px; }
+  body.hybrid-ui .hybrid-inspector { width: min(340px, calc(100vw - 12px)); z-index: 90; }
+  body.hybrid-ui :is(.treemap-v2-layout, .heatmap-v2-layout) { position: relative; grid-template-columns: minmax(0, 1fr); }
+  body.hybrid-ui :is(.treev2-inspector, .heatv2-inspector) {
+    position: absolute;
+    inset: 0 0 0 auto;
+    z-index: 90;
+    width: min(340px, calc(100vw - 12px));
+    visibility: hidden;
+    overflow: auto;
+    background: var(--ui-surface-subtle);
+    box-shadow: -6px 0 20px #18334630;
+  }
+  body.hybrid-ui.mobile-details-open :is(.treev2-inspector, .heatv2-inspector) { visibility: visible; }
+  body.hybrid-ui .mobile-panel-close {
+    display: block;
+    width: 100%;
+    min-height: 40px;
+    margin-bottom: 12px;
+    border: 1px solid var(--ui-control-line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--app-ink);
+    font-size: 13px;
+  }
+  body.hybrid-ui .treev2-stage { grid-template-rows: auto minmax(360px, 1fr); overflow: auto; }
+  body.hybrid-ui .treev2-pathbar { flex-wrap: wrap; padding: 8px; }
+  body.hybrid-ui .react-tree-path { flex-wrap: wrap; }
+  body.hybrid-ui .react-tree-path > small { white-space: normal; }
+  body.hybrid-ui :is(.plot-analysis__canvas, .pyramid-analysis__canvas) { overflow: auto; }
+  body.hybrid-ui :is(.plot-analysis-svg, .pyramid-analysis-svg, .plot-distribution-svg) { min-width: 760px; }
+  body.hybrid-ui .svg-chart { min-width: 760px; }
+  body.hybrid-ui .mobile-chart-hint.is-needed { display: block; padding: 4px 0; color: var(--app-muted); font-size: 11px; }
+  body.hybrid-ui :is(.plot-analysis__toolbar, .pyramid-analysis__toolbar) { flex-wrap: wrap; }
+  body.hybrid-ui :is(.plot-analysis__stats, .pyramid-analysis__stats) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.hybrid-ui .plot-analysis__legend { display: flex; flex-wrap: wrap; }
+  body.hybrid-ui .mortality-map-column { grid-template-rows: auto minmax(0, 1fr); }
+  body.hybrid-ui .react-map-chrome { flex-wrap: wrap; gap: 8px; }
+  body.hybrid-ui .react-map-chrome__main, body.hybrid-ui .react-map-chrome__actions { width: 100%; justify-content: space-between; }
+  body.hybrid-ui .react-map-chrome__toggle .react-map-chrome__label { display: inline; }
+  body.hybrid-ui .mortality-map-side { width: min(340px, calc(100vw - 12px)); z-index: 90; }
+  body.hybrid-ui .infra-shell,
+  body.hybrid-ui .infra-shell.is-panel-collapsed { position: relative; grid-template-columns: minmax(0, 1fr); }
+  body.hybrid-ui .infra-map-column { grid-column: 1; width: 100%; }
+  body.hybrid-ui .infra-layer-composer { position: absolute; inset: 0 auto 0 0; z-index: 90; width: min(340px, calc(100vw - 12px)); }
+  body.hybrid-ui .infra-shell.is-panel-collapsed .infra-layer-composer { visibility: hidden; }
+  /* Match the desktop infrastructure selectors: its rail must not reserve
+     a left column after navigation has moved to the bottom of the phone. */
+  body.hybrid-ui.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .workspace,
+  body.hybrid-ui.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .workspace.drawer-collapsed { grid-template-columns: minmax(0, 1fr); }
+  body.hybrid-ui.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .content { grid-column: 1 / -1; }
+  body.hybrid-ui .infra-layer-composer { max-width: 100%; }
+  body.hybrid-ui .infra-panel-scroll { flex: 1; overscroll-behavior: contain; }
+  body.hybrid-ui .react-infra-panel-header { min-width: 0; gap: 12px; }
+  body.hybrid-ui .react-infra-panel-header > div { min-width: 0; }
+  body.hybrid-ui .react-infra-panel-header h3 { overflow-wrap: anywhere; line-height: 1.35; }
+  body.hybrid-ui .react-infra-panel-header button { flex: 0 0 40px; width: 40px; height: 40px; }
+  body.hybrid-ui .infra-map-toolbar { top: 8px; left: 8px; right: 48px; gap: 4px; padding: 8px; }
+  body.hybrid-ui .react-infra-map-chrome { flex-wrap: wrap; gap: 8px; }
+  body.hybrid-ui .react-infra-map-chrome__label { display: inline; font-size: 12px; }
+  body.hybrid-ui .react-infra-map-chrome__actions { gap: 4px; }
+  body.hybrid-ui .react-infra-map-chrome__title { min-width: 0; }
+  body.hybrid-ui .react-infra-map-chrome__title b { white-space: normal; overflow-wrap: anywhere; }
+  body.hybrid-ui .infra-map-toolbar .hybrid-map-fullscreen { align-self: flex-end; }
+  body.hybrid-ui .method { z-index: 300; top: 12px; right: 8px; width: calc(100vw - 16px); max-height: calc(100dvh - 104px); }
+}
+
+@media (max-width: 600px) {
+  body.hybrid-ui .infra-layer-composer { width: 100%; }
+}
+
+@media (max-width: 1023px) {
+  /* Analytics scroll vertically at their native text size, rather than
+     squeezing a desktop viewBox into the remaining phone height. */
+  body.hybrid-ui #viz:is([data-view="arrow"], [data-view="pyramid"], [data-view="plot"], [data-view="dotogram"]) {
+    display: block;
+    overflow: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+  body.hybrid-ui #viz :is(.rank-analysis, .pyramid-analysis, .plot-analysis) {
+    display: block;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  body.hybrid-ui #viz :is(.rank-analysis__canvas, .pyramid-analysis__canvas, .plot-analysis__canvas) { overflow: visible; }
+  body.hybrid-ui #viz :is(.rank-analysis-svg, .pyramid-analysis-svg, .plot-analysis-svg, .plot-distribution-svg, .dotogram-ranked, .dotogram-groups) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto !important;
+  }
+  body.hybrid-ui #viz :is(.rank-analysis__footnote, .pyramid-analysis__footnote, .plot-analysis__footnote, .chart-note) {
+    max-height: none;
+    white-space: normal;
+    overflow: visible;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  body.hybrid-ui .pyramid-analysis__highlights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  body.hybrid-ui .pyramid-analysis__highlights > span { min-width: 0; padding: 6px; }
+  body.hybrid-ui .pyramid-analysis__highlights :is(small, b) { white-space: normal; font-size: 10px; }
+  body.hybrid-ui .pyramid-analysis-svg :is(.pyramid-age-label, .pyramid-value-label, .pyramid-scale-label) { font-size: 11px; }
+  body.hybrid-ui .pyramid-analysis-svg :is(.pyramid-sex-title, .pyramid-age-title) { font-size: 12px; }
+  body.hybrid-ui .rank-analysis-svg :is(.rank-label, .rank-label-value) { font-size: 11px; }
+  body.hybrid-ui #viz :is(.dotogram-ranked, .dotogram-groups) .row-label { font-size: 11px; }
+  body.hybrid-ui #viz :is(.dotogram-ranked, .dotogram-groups) :is(.axis-label, .dot-value-label) { font-size: 11px; }
+  body.hybrid-ui #viz .chart-note { position: static; }
+}
+
+@media (max-width: 700px) {
+  body.hybrid-ui .rank-analysis-svg .rank-mobile-hit { fill: #fff; stroke: #e0e7f0; }
+  body.hybrid-ui .rank-analysis-svg .is-selected .rank-mobile-hit { fill: #f0f6ff; stroke: #3979bd; }
+  body.hybrid-ui .rank-analysis-svg .rank-trajectory { opacity: 1 !important; }
+  body.hybrid-ui .rank-analysis-svg :is(.rank-label, .rank-label-value, .rank-delta-text) { font-size: 12px; }
+  body.hybrid-ui .rank-analysis-svg .rank-rank-number { fill: #fff; }
+  body.hybrid-ui .rank-analysis-svg .rank-label { font-weight: 600; }
+  body.hybrid-ui .plot-analysis-svg :is(.plot-axis-label, .plot-n-label, .plot-delta-label) { font-size: 11px; }
+  body.hybrid-ui .plot-distribution-svg :is(.plot-axis-label, .plot-quantile-label, .plot-section-label, .plot-y-label) { font-size: 11px; }
+  body.hybrid-ui #viz :is(.dotogram-ranked, .dotogram-groups) .row-label { font-size: 12px; font-weight: 600; }
+  body.hybrid-ui #viz :is(.dotogram-ranked, .dotogram-groups) :is(.axis-label, .dot-value-label, .dot-mobile-label, .dot-median-label) { font-size: 11px; }
+  body.hybrid-ui .dot-mobile-label { fill: #415a73; }
+}
+
+@media (max-width: 1023px) and (max-height: 500px) {
+  body.hybrid-ui:is([data-shell-view="arrow"], [data-shell-view="pyramid"], [data-shell-view="plot"], [data-shell-view="dotogram"]) .hero .app-header-context { display: none; }
+  body.hybrid-ui:is([data-shell-view="arrow"], [data-shell-view="pyramid"], [data-shell-view="plot"], [data-shell-view="dotogram"]) .hero .mobile-tools { width: auto; }
+  body.hybrid-ui:is([data-shell-view="arrow"], [data-shell-view="pyramid"], [data-shell-view="plot"], [data-shell-view="dotogram"]) .chart-head :is(p, .mobile-chart-hint) { display: none; }
+  body.hybrid-ui .pyramid-analysis__toolbar { min-height: 0; padding: 6px 12px; gap: 8px; }
+  body.hybrid-ui .pyramid-analysis__summary { flex: 1 1 180px; }
+  body.hybrid-ui .pyramid-analysis__highlights { width: auto; flex: 1 1 300px; }
+  body.hybrid-ui .plot-analysis__stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

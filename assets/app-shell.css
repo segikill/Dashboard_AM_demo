@@ -1,0 +1,1131 @@
+:root {
+  --app-header-h: 52px;
+  --app-filter-h: 50px;
+  --app-rail-w: 80px;
+  --app-controls-w: 272px;
+  --app-inspector-w: 292px;
+  --app-navy: #102f45;
+  --app-navy-2: #1b4058;
+  --app-blue: #2868a8;
+  --app-ink: #203344;
+  --app-muted: #5d6f7c;
+  --app-line: #d8dfe4;
+  --app-panel: #ffffff;
+  --app-canvas: #f3f5f6;
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-6: 24px;
+  --ui-surface-subtle: #f5f7f8;
+  --ui-accent-soft: #edf4fa;
+  --ui-control-line: #bfcbd4;
+}
+
+html:has(body.app-interface-v2),
+body.app-interface-v2 {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.app-interface-v2 {
+  min-width: 1024px;
+  background: var(--app-canvas);
+  color: var(--app-ink);
+}
+
+body.app-interface-v2 .site-skip-link {
+  z-index: 1000;
+}
+
+body.app-interface-v2 .atlas-main {
+  --controls-w: var(--app-controls-w);
+  --atlas-viz-height: 100%;
+  display: grid;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  grid-template-rows: var(--app-header-h) var(--app-filter-h) minmax(0, 1fr);
+  overflow: hidden;
+}
+
+/* System header */
+body.app-interface-v2 .atlas-main .hero {
+  position: relative;
+  z-index: 60;
+  display: flex !important;
+  min-width: 0;
+  min-height: 0;
+  height: var(--app-header-h);
+  align-items: center;
+  gap: var(--ui-space-3);
+  padding: 0 var(--ui-space-4);
+  border: 0;
+  border-radius: 0;
+  background: var(--app-navy);
+  box-shadow: none;
+}
+
+body.app-interface-v2 .atlas-main .hero::after {
+  position: absolute;
+  right: 22%;
+  bottom: 0;
+  left: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(117, 198, 226, .28), transparent);
+  content: "";
+  pointer-events: none;
+  display: none;
+}
+
+body.app-interface-v2 .atlas-main .hero .eyebrow,
+body.app-interface-v2 .atlas-main .hero > p,
+body.app-interface-v2 .atlas-main .hero > .tags {
+  display: none !important;
+}
+
+.app-brand-mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border-right: 1px solid rgba(255, 255, 255, .15);
+  color: #bfe6f2;
+}
+
+.app-brand-mark svg {
+  width: 28px;
+  height: 28px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.55;
+}
+
+body.app-interface-v2 .atlas-main .hero h1 {
+  overflow: hidden;
+  min-width: 260px;
+  max-width: min(520px, 38vw);
+  margin: 0;
+  color: #fff;
+  font-size: clamp(17px, 1.32vw, 22px);
+  font-weight: 780;
+  line-height: 1.4;
+  letter-spacing: -.015em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.app-interface-v2 .atlas-main .hero .react-header-status-host {
+  display: contents;
+}
+
+body.app-interface-v2 .atlas-main .hero .react-header-status-host[hidden],
+body.app-interface-v2 .atlas-main .hero [data-legacy-header-status][hidden],
+body.app-interface-v2 .atlas-main .hero [data-legacy-header-actions][hidden] {
+  display: none !important;
+}
+
+.app-header-context {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--ui-space-2);
+}
+
+.app-header-pill {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 8px;
+  background: transparent;
+  color: #dcecf7;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.app-header-pill b {
+  color: #fff;
+  font-size: 11px;
+}
+
+body.app-interface-v2 .atlas-main > .kpis {
+  display: none !important;
+}
+
+body.app-interface-v2 .hero .app-header-kpi {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: var(--ui-space-2);
+  margin: 0;
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.app-interface-v2 .hero .app-header-kpi b {
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+}
+
+body.app-interface-v2 .hero .app-header-kpi span {
+  color: #c7dcec;
+  font-size: 9.5px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.app-header-actions {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ui-space-2);
+}
+
+.app-header-actions > div {
+  min-width: 0;
+}
+
+body.app-interface-v2 .hero .atlas-actions {
+  display: flex;
+  gap: var(--ui-space-1);
+  margin: 0;
+}
+
+body.app-interface-v2 .hero .atlas-actions button,
+.app-help-button {
+  min-height: 30px;
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border: 1px solid rgba(255, 255, 255, .17);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .08);
+  color: #f2f8fc;
+  cursor: pointer;
+  font-size: 9.5px;
+  font-weight: 800;
+}
+
+body.app-interface-v2 .hero .atlas-actions button:hover,
+.app-help-button:hover {
+  border-color: rgba(166, 221, 243, .55);
+  background: rgba(255, 255, 255, .14);
+}
+
+body.app-interface-v2 .hero .atlas-action-status {
+  position: fixed;
+  z-index: 120;
+  top: 60px;
+  right: 12px;
+  max-width: 360px;
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(8, 47, 77, .94);
+  color: #fff;
+  box-shadow: 0 8px 26px rgba(8, 47, 77, .22);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+body.app-interface-v2 .hero .atlas-action-status:empty {
+  display: none;
+}
+
+/* Global filters */
+body.app-interface-v2 .global-filterbar {
+  position: relative;
+  z-index: 50;
+  display: flex !important;
+  min-width: 0;
+  min-height: 0;
+  height: var(--app-filter-h);
+  align-items: center;
+  gap: var(--ui-space-2);
+  margin: 0;
+  padding: var(--ui-space-1) var(--ui-space-3) var(--ui-space-1) calc(var(--app-rail-w) + var(--ui-space-3));
+  border: 0;
+  border-bottom: 1px solid var(--app-line);
+  border-radius: 0;
+  background: var(--app-panel);
+  box-shadow: none;
+}
+
+/* Keep the navigation rail visually connected to the dark system header. */
+body.app-interface-v2 .global-filterbar::before {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: -1px;
+  left: 0;
+  width: var(--app-rail-w);
+  border-right: 1px solid rgba(255, 255, 255, .08);
+  background: var(--app-navy);
+  box-shadow: none;
+  content: "";
+  pointer-events: none;
+}
+
+body.app-interface-v2 .global-filterbar > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* React island for the shared filters. The host does not create an extra
+   flex box, so the migrated controls keep the exact legacy toolbar geometry. */
+body.app-interface-v2 .global-filterbar .react-global-filter-host {
+  display: contents;
+}
+
+body.app-interface-v2 .global-filterbar .react-global-filter-host[hidden],
+body.app-interface-v2 .global-filterbar [data-legacy-global-filters][hidden] {
+  display: none !important;
+}
+
+/* Infrastructure does not use mortality filters. Keep the reserved toolbar
+   footprint so switching views never shifts the workspace below it. */
+body.app-interface-v2[data-shell-view="infrastructure"] .global-filterbar .filters,
+body.app-interface-v2[data-shell-view="infrastructure"] .global-filterbar .atlas-search {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+body.app-interface-v2 .global-filterbar .filters {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  grid-template-columns:
+    minmax(138px, .8fr)
+    minmax(180px, 1fr)
+    minmax(156px, .9fr)
+    auto;
+  gap: var(--ui-space-2);
+  align-items: center;
+  order: 1;
+  padding: 0;
+  border: 0;
+}
+
+body.app-interface-v2 .global-filterbar .field {
+  display: grid;
+  min-width: 0;
+  height: 36px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ui-space-1);
+  margin: 0;
+  padding: 0 var(--ui-space-1) 0 var(--ui-space-2);
+  border: 1px solid var(--ui-control-line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+body.app-interface-v2 .global-filterbar .field label {
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  color: var(--app-ink);
+  font-size: 9.5px;
+  font-weight: 850;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.app-interface-v2 .global-filterbar .field select,
+body.app-interface-v2 .global-filterbar .field input {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 24px 0 var(--ui-space-2);
+  border: 0;
+  border-radius: 6px;
+  background-color: var(--ui-surface-subtle);
+  color: var(--app-ink);
+  font-size: 10.5px;
+  font-weight: 650;
+}
+
+body.app-interface-v2 .global-filterbar .seg {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(30px, 1fr));
+  gap: 2px;
+}
+
+body.app-interface-v2 .global-filterbar .seg button {
+  height: 26px;
+  min-width: 0;
+  padding: 2px;
+  border-radius: 6px;
+  font-size: 9px;
+}
+
+body.app-interface-v2 .global-filterbar select:disabled,
+body.app-interface-v2 .global-filterbar .seg button:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+  filter: saturate(.55);
+}
+
+.app-filter-reset {
+  height: 36px;
+  padding: 0 var(--ui-space-3);
+  border: 1px solid var(--ui-control-line);
+  border-radius: 8px;
+  background: var(--ui-surface-subtle);
+  color: var(--app-ink);
+  cursor: pointer;
+  font-size: 9.5px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.app-filter-reset:hover {
+  border-color: #8fb1d1;
+  background: #eef5fb;
+}
+
+body.app-interface-v2 .global-filterbar .atlas-search {
+  width: min(230px, 15vw);
+  min-width: 150px;
+  order: 2;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+body.app-interface-v2 .global-filterbar .atlas-search > label,
+body.app-interface-v2 .global-filterbar .atlas-search__hint {
+  display: none;
+}
+
+body.app-interface-v2 .global-filterbar .atlas-search__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  gap: 4px;
+}
+
+body.app-interface-v2 .global-filterbar .atlas-search input,
+body.app-interface-v2 .global-filterbar .atlas-search button {
+  height: 36px;
+  min-height: 36px;
+  border-radius: 9px;
+  font-size: 9.5px;
+}
+
+body.app-interface-v2 .global-filterbar .atlas-search input {
+  padding: 5px 8px;
+}
+
+/* Main application grid */
+body.app-interface-v2 .atlas-main .workspace,
+body.app-interface-v2.infrastructure-view .atlas-main .workspace {
+  display: grid !important;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  align-items: stretch;
+  gap: 0;
+  grid-template-columns: var(--app-rail-w) var(--controls-w) minmax(0, 1fr);
+  overflow: hidden;
+  transition: grid-template-columns .2s ease;
+}
+
+body.app-interface-v2 .atlas-main .workspace.drawer-collapsed {
+  grid-template-columns: var(--app-rail-w) 0 minmax(0, 1fr);
+}
+
+body.app-interface-v2 .viz-rail {
+  position: relative;
+  z-index: 35;
+  top: auto;
+  display: flex;
+  width: var(--app-rail-w);
+  height: 100%;
+  min-height: 0;
+  padding: var(--ui-space-1);
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 0;
+  background: var(--app-navy);
+  box-shadow: none;
+}
+
+@media (min-width: 1024px) {
+  body.app-interface-v2 .atlas-main {
+    position: relative;
+  }
+
+  /* Anchor navigation below the header across both filter rows and maps. */
+  body.app-interface-v2 .atlas-main .viz-rail {
+    position: absolute;
+    inset: var(--app-header-h) auto 0 0;
+    z-index: 55;
+    height: auto;
+  }
+
+  body.app-interface-v2 .atlas-main .workspace > .sidebar {
+    grid-column: 2;
+  }
+
+  body.app-interface-v2 .atlas-main .workspace > .content {
+    grid-column: 3;
+  }
+
+  body.app-interface-v2.infrastructure-view .atlas-main .workspace > .content {
+    grid-column: 2;
+  }
+}
+
+.react-navigation-rail-host[hidden] {
+  display: none !important;
+}
+
+body.app-interface-v2 .viz-rail > .legacy-navigation-rail {
+  display: contents;
+}
+
+body.app-interface-v2 .viz-rail.is-react-owned > .legacy-navigation-rail {
+  display: none;
+}
+
+body.app-interface-v2 .react-navigation-rail-host,
+body.app-interface-v2 .react-navigation-rail {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+body.app-interface-v2 .react-navigation-rail .viz-nav {
+  width: 100%;
+}
+
+body.app-interface-v2 .react-navigation-rail .viz-btn:focus-visible,
+body.app-interface-v2 .react-navigation-rail .rail-drawer-toggle:focus-visible {
+  outline: 2px solid #f7c948;
+  outline-offset: 1px;
+}
+
+body.app-interface-v2 .viz-rail .rail-drawer-toggle {
+  min-height: 36px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+}
+
+body.app-interface-v2 .viz-rail .rail-drawer-toggle small {
+  display: none;
+}
+
+body.app-interface-v2 .viz-rail .viz-nav {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-rows: repeat(8, minmax(48px, 1fr));
+  gap: var(--ui-space-1);
+}
+
+body.app-interface-v2 .viz-rail .viz-btn {
+  min-height: 0;
+  padding: var(--ui-space-3) var(--ui-space-1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--ui-space-3);
+  background: transparent;
+  border-color: transparent;
+  color: #dce5eb;
+}
+
+body.app-interface-v2 .viz-rail .viz-btn::before {
+  display: none;
+}
+
+body.app-interface-v2 .viz-rail .viz-btn .icon,
+body.app-interface-v2 .viz-rail .viz-btn.active .icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+}
+
+body.app-interface-v2 .viz-rail .viz-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.75;
+}
+
+body.app-interface-v2 .viz-rail .viz-btn .rail-label {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 9px;
+  line-height: 1.2;
+  text-overflow: clip;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+body.app-interface-v2 .viz-rail .viz-btn.active {
+  border-color: #81add3;
+  background: var(--app-blue);
+  box-shadow: inset 3px 0 0 #b9d7ef;
+  color: #fff;
+}
+
+body.app-interface-v2 .atlas-main .sidebar,
+body.app-interface-v2.infrastructure-view .atlas-main .sidebar {
+  position: relative;
+  z-index: 25;
+  top: auto;
+  display: block;
+  width: var(--controls-w);
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-height: none;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid var(--app-line);
+  border-radius: 0;
+  background: var(--app-panel);
+  box-shadow: none;
+}
+
+body.app-interface-v2 .drawer-inner {
+  width: var(--controls-w);
+  height: 100%;
+}
+
+body.app-interface-v2 .drawer-head {
+  min-height: 48px;
+  padding: var(--ui-space-2) var(--ui-space-3);
+  background: var(--ui-surface-subtle);
+}
+
+body.app-interface-v2 .drawer-head span,
+body.app-interface-v2 .drawer-section-title {
+  font-size: 7.5px;
+}
+
+body.app-interface-v2 .drawer-head h2 {
+  font-size: 12.5px;
+  line-height: 1.14;
+}
+
+body.app-interface-v2 .drawer-head-actions button {
+  width: 28px;
+  height: 28px;
+}
+
+body.app-interface-v2 .drawer-scroll {
+  min-height: 0;
+  padding: var(--ui-space-2) var(--ui-space-3) var(--ui-space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+body.app-interface-v2 .drawer-scroll .field {
+  margin: var(--ui-space-2) 0;
+  padding: var(--ui-space-2);
+  border-radius: 8px;
+}
+
+body.app-interface-v2 .drawer-scroll .field label {
+  font-size: 8.5px;
+}
+
+body.app-interface-v2 .drawer-scroll select,
+body.app-interface-v2 .drawer-scroll input {
+  min-height: 31px;
+  font-size: 10px;
+}
+
+
+body.app-interface-v2 .atlas-main .workspace.drawer-collapsed .sidebar {
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+/* View stage */
+body.app-interface-v2 .atlas-main .content,
+body.app-interface-v2.infrastructure-view .atlas-main .content {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr);
+  padding: 0;
+  overflow: hidden;
+}
+
+body.app-interface-v2 .atlas-main .card,
+body.app-interface-v2.infrastructure-view .atlas-main .card {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  grid-template-rows: 48px minmax(0, 1fr);
+  overflow: hidden;
+}
+
+body.app-interface-v2 .chart-head {
+  position: relative;
+  z-index: 12;
+  display: flex;
+  min-width: 0;
+  min-height: 48px;
+  align-items: center;
+  gap: 12px;
+  padding: var(--ui-space-2) var(--ui-space-3);
+  border-bottom: 1px solid var(--app-line);
+  background: var(--app-panel);
+  box-shadow: none;
+}
+
+body.app-interface-v2 .chart-head > div:first-child {
+  display: grid;
+  min-width: 180px;
+  flex: 1 1 auto;
+  gap: 1px;
+}
+
+body.app-interface-v2 .chart-head h2 {
+  overflow: hidden;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.app-interface-v2 .chart-head p {
+  overflow: hidden;
+  max-width: 760px;
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 8.5px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.app-interface-v2 .chart-meta {
+  display: flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  gap: 4px;
+  margin: 0;
+}
+
+body.app-interface-v2 .chart-meta .chip {
+  padding: var(--ui-space-1) var(--ui-space-2);
+  font-size: 8px;
+  white-space: nowrap;
+  background: var(--ui-surface-subtle);
+  color: var(--app-muted);
+}
+
+body.app-interface-v2 .chart-head .atlas-change-notice {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 12px;
+}
+
+body.app-interface-v2 .viz {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0 !important;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  background: #fbfcfe;
+}
+
+body.app-interface-v2 .treemap {
+  height: 100% !important;
+  min-height: 0;
+}
+
+body.app-interface-v2 .svg-chart {
+  width: 100%;
+  min-height: 100%;
+}
+
+body.app-interface-v2 .method {
+  position: fixed;
+  z-index: 180;
+  top: 60px;
+  right: 12px;
+  display: none;
+  width: min(520px, calc(100vw - 90px));
+  max-height: calc(100vh - 72px);
+  margin: 0;
+  padding: var(--ui-space-4);
+  overflow: auto;
+  border-radius: 14px;
+  box-shadow: 0 18px 55px rgba(21, 45, 72, .25);
+}
+
+body.app-interface-v2 .method.is-open {
+  display: block;
+}
+
+body.app-interface-v2 .method-topic {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #dce5ef;
+}
+
+body.app-interface-v2 .method-topic > summary {
+  padding: 5px 0;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+body.app-interface-v2 .method-topic > summary:focus-visible {
+  outline: 2px solid #2d6eac;
+  outline-offset: 3px;
+}
+
+body.app-interface-v2 footer {
+  display: none;
+}
+
+/* Maps already own a local 48 px toolbar. */
+body.app-interface-v2[data-shell-view="map"] .atlas-main .card,
+body.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .card {
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "map-stage";
+}
+
+body.app-interface-v2[data-shell-view="map"] .atlas-main .chart-head,
+body.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .chart-head {
+  display: none;
+}
+
+body.app-interface-v2 #viz[data-view="map"],
+body.app-interface-v2 #viz[data-view="infrastructure"] {
+  grid-area: map-stage;
+  height: 100%;
+  min-height: 0 !important;
+}
+
+body.app-interface-v2 .mortality-map-host,
+body.app-interface-v2 .mortality-map-shell,
+body.app-interface-v2 .infra-app,
+body.app-interface-v2 .infra-shell {
+  min-height: 0;
+  height: 100%;
+}
+
+/* View-specific grids */
+body.app-interface-v2[data-shell-view="infrastructure"] .atlas-main {
+  --controls-w: 286px;
+}
+
+body.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .workspace,
+body.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .workspace.drawer-collapsed {
+  grid-template-columns: var(--app-rail-w) minmax(0, 1fr);
+}
+
+body.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .sidebar {
+  display: none;
+}
+
+body.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .viz-rail .rail-drawer-toggle {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+body.app-interface-v2.infrastructure-view[data-shell-view="infrastructure"] .atlas-main .content {
+  grid-column: 2;
+}
+
+body.app-interface-v2[data-shell-view="treemap"] .atlas-main {
+  --controls-w: 244px;
+}
+
+body.app-interface-v2[data-shell-view="heatmap"] .atlas-main {
+  --controls-w: 250px;
+}
+
+body.app-interface-v2[data-shell-view="arrow"] .atlas-main {
+  --controls-w: 240px;
+}
+
+body.app-interface-v2[data-shell-view="plot"] .atlas-main {
+  --controls-w: 250px;
+}
+
+body.app-interface-v2[data-shell-view="dotogram"] .atlas-main {
+  --controls-w: 244px;
+}
+
+body.app-interface-v2[data-shell-view="pyramid"] .sidebar,
+body.app-interface-v2[data-shell-view="pyramid"] .rail-drawer-toggle {
+  display: block;
+}
+
+.shell-inline-controls {
+  display: none;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+body.app-interface-v2 .shell-inline-controls #localControls {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+body.app-interface-v2 .shell-inline-controls #localControls .field {
+  display: grid;
+  min-width: 150px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 3px 5px 3px 7px;
+  border: 1px solid var(--app-line);
+  border-radius: 8px;
+}
+
+body.app-interface-v2 .shell-inline-controls #localControls label {
+  margin: 0;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+body.app-interface-v2 .shell-inline-controls #localControls select {
+  height: 28px;
+  min-height: 28px;
+  padding: 2px 22px 2px 5px;
+  border: 0;
+  background-color: #f7f9fc;
+  font-size: 9.5px;
+}
+
+/* Mortality inspector: fixed column on wide screens, overlay on compact screens. */
+.shell-inspector-toggle {
+  display: none;
+  padding: 6px 9px;
+  border: 1px solid #c7d5e2;
+  border-radius: 8px;
+  background: #fff;
+  color: #31536f;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+@media (max-width: 1540px) {
+  body.app-interface-v2 .global-filterbar .atlas-search {
+    display: none;
+  }
+
+  body.app-interface-v2 .mortality-map-shell {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.app-interface-v2 .mortality-map-side {
+    position: absolute;
+    z-index: 14;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: block;
+    width: min(300px, 34vw);
+    border-left: 1px solid var(--app-line);
+    background: rgba(255, 255, 255, .98);
+    box-shadow: -8px 0 24px rgba(31, 54, 82, .14);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(102%);
+    transition: opacity .16s ease, transform .2s ease;
+  }
+
+  body.app-interface-v2.shell-inspector-open .mortality-map-side {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  body.app-interface-v2 .shell-inspector-toggle {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 1366px) {
+  :root {
+    --app-header-h: 48px;
+    --app-filter-h: 44px;
+    --app-rail-w: 80px;
+    --app-controls-w: 240px;
+  }
+
+  body.app-interface-v2 .atlas-main .hero {
+    height: var(--app-header-h);
+    gap: var(--ui-space-2);
+    padding-right: var(--ui-space-2);
+  }
+
+  body.app-interface-v2 .atlas-main .hero h1 {
+    max-width: 340px;
+    font-size: 17px;
+  }
+
+  .app-header-context {
+    gap: 4px;
+  }
+
+  .app-header-pill,
+  body.app-interface-v2 .hero .app-header-kpi {
+    min-height: 27px;
+    padding: var(--ui-space-1) var(--ui-space-2);
+    font-size: 9px;
+  }
+
+  body.app-interface-v2 .hero .atlas-actions button {
+    min-height: 27px;
+    padding: var(--ui-space-1) var(--ui-space-2);
+    font-size: 8.5px;
+  }
+
+  body.app-interface-v2 .global-filterbar {
+    padding: var(--ui-space-1) var(--ui-space-2) var(--ui-space-1) calc(var(--app-rail-w) + var(--ui-space-2));
+  }
+
+  body.app-interface-v2 .global-filterbar .filters {
+    grid-template-columns:
+      minmax(118px, .8fr)
+      minmax(150px, 1fr)
+      minmax(128px, .88fr)
+      auto;
+    gap: 4px;
+  }
+
+  body.app-interface-v2 .global-filterbar .field,
+  .app-filter-reset {
+    height: 34px;
+  }
+
+  body.app-interface-v2 .global-filterbar .field label {
+    display: block;
+    font-size: 8.5px;
+  }
+
+  body.app-interface-v2 .global-filterbar .field select {
+    font-size: 9.5px;
+  }
+
+  body.app-interface-v2[data-shell-view="infrastructure"] .atlas-main {
+    --controls-w: 260px;
+  }
+
+  body.app-interface-v2[data-shell-view="treemap"] .atlas-main,
+  body.app-interface-v2[data-shell-view="heatmap"] .atlas-main,
+  body.app-interface-v2[data-shell-view="plot"] .atlas-main,
+  body.app-interface-v2[data-shell-view="dotogram"] .atlas-main {
+    --controls-w: 230px;
+  }
+
+  body.app-interface-v2[data-shell-view="arrow"] .atlas-main {
+    --controls-w: 220px;
+  }
+
+  body.app-interface-v2 .drawer-head h2 {
+    font-size: 11.5px;
+  }
+
+  body.app-interface-v2 .viz-rail .viz-btn .rail-label {
+    font-size: 9px;
+  }
+}
+
+@media (min-width: 2200px) {
+  :root {
+    --app-header-h: 58px;
+    --app-filter-h: 56px;
+    --app-rail-w: 80px;
+    --app-controls-w: 304px;
+  }
+
+  body.app-interface-v2 .atlas-main .hero h1 {
+    font-size: 25px;
+  }
+
+  body.app-interface-v2 .viz-rail .viz-btn .rail-label {
+    font-size: 9px;
+  }
+
+  body.app-interface-v2 .drawer-head h2 {
+    font-size: 14px;
+  }
+
+  body.app-interface-v2 .drawer-scroll .field label {
+    font-size: 9.5px;
+  }
+
+  body.app-interface-v2 .drawer-scroll select,
+  body.app-interface-v2 .drawer-scroll input {
+    min-height: 34px;
+    font-size: 11px;
+  }
+
+  body.app-interface-v2[data-shell-view="infrastructure"] .atlas-main {
+    --controls-w: 320px;
+  }
+
+  body.app-interface-v2[data-shell-view="treemap"] .atlas-main,
+  body.app-interface-v2[data-shell-view="heatmap"] .atlas-main,
+  body.app-interface-v2[data-shell-view="plot"] .atlas-main,
+  body.app-interface-v2[data-shell-view="dotogram"] .atlas-main {
+    --controls-w: 286px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.app-interface-v2 *,
+  body.app-interface-v2 *::before,
+  body.app-interface-v2 *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,81 @@
+/* Shared card treatment; scoped to avoid legacy tooltip/table rules. */
+.territory-card-dock { position: absolute; z-index: 5; top: 16px; left: 16px; width: min(280px, calc(100% - 72px)); max-height: calc(100% - 32px); overflow: auto; scrollbar-width: thin; border-radius: 12px; box-shadow: 0 12px 28px #18343d14, 0 2px 5px #18343d08; }
+.territory-card-dock[hidden], .site-map-selection-card[hidden] { display: none !important; }
+.infra-map .territory-card-dock { top: 84px; max-height: calc(100% - 100px); }
+.territory-card { box-sizing: border-box; min-width: 0; width: 100%; padding: 8px; border: 1px solid #dce3e5; border-radius: 8px; background: #fff; color: #182c36; font: 400 12px/1.4 Inter, "Segoe UI", Arial, sans-serif; font-variant-numeric: tabular-nums; text-align: left; }
+.territory-card h3 { padding: 0; margin: 0 0 3px; font-size: 13px; line-height: 1.3; font-weight: 600; letter-spacing: 0; overflow-wrap: anywhere; }
+.territory-card p { margin: 0; }
+.territory-card .territory-card__context, .territory-card .territory-card__group { font-size: 11px; line-height: 1.3; font-weight: 400; color: #50636c; overflow-wrap: anywhere; }
+.territory-card .territory-card__group { color: #64747b; }
+.territory-card__primary { margin: 5px 0; }
+.territory-card__stat { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.territory-card .territory-card__stat > strong { color: #182c36; font-size: 26px; line-height: 1.1; letter-spacing: -0.5px; font-weight: 500; overflow-wrap: anywhere; }
+.territory-card .territory-card__stat > span { max-width: 100%; color: #50636c; font-size: 11px; font-weight: 400; overflow-wrap: anywhere; }
+.territory-card .territory-card__label { margin-top: 3px; color: #50636c; font-size: 11px; line-height: 1.3; }
+.territory-card .territory-card__basis { color: #50636c; font-size: 11px; margin: 0 0 6px; overflow-wrap: anywhere; }
+.territory-card__footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-top: 5px; line-height: 1.3; border-top: 1px solid #dce3e5; }
+.territory-card__footer > span { min-width: 0; color: #50636c; font-size: 11px; overflow-wrap: anywhere; }
+.territory-card .territory-card__footer > strong { flex: 0 0 auto; font-size: 13px; font-weight: 500; color: #182c36; }
+.territory-card--pinned { position: relative; padding: 12px; border-radius: 10px; }
+.territory-card--pinned h3 { padding-right: 32px; font-size: 14px; }
+.territory-card--pinned .territory-card__primary { margin: 10px 0; }
+.territory-card .territory-card__close { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 32px; height: 32px; padding: 6px; border: 0; border-radius: 6px; background: transparent; color: #64747b; cursor: pointer; }
+.territory-card__close svg, .territory-card__details svg, .territory-picker summary svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.territory-card .territory-card__details { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; padding: 6px 0 0; margin: 8px 0 0; min-height: 36px; border: 0; border-top: 1px solid #dce3e5; border-radius: 0; background: transparent; color: #185568; font: 500 12px/1.45 Inter, "Segoe UI", Arial, sans-serif; text-align: left; cursor: pointer; }
+.territory-card__close:hover { background: #eff3f4; }
+.territory-card__details:hover { color: #112e3a; }
+.territory-card :is(button, a):focus-visible, .territory-picker :is(summary, select, button):focus-visible { outline: 2px solid #185568; outline-offset: 3px; }
+.territory-card--empty .territory-card__stat > strong { font-size: 18px; letter-spacing: 0; }
+.territory-card__series { margin-top: 8px; }
+.territory-card .territory-card__series > p { font-size: 11px; color: #64747b; }
+.territory-card__series svg { display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
+.territory-card__series text { font: 400 13px Inter, "Segoe UI", Arial, sans-serif; fill: #50636c; }
+.territory-card__series .territory-card__point-value { fill: #182c36; font-weight: 500; }
+.territory-card__baseline { stroke: #e2e8e9; stroke-width: 1; }
+.territory-card__line { fill: none; stroke: #185568; stroke-width: 1.5; }
+.territory-card__series circle { fill: #fff; stroke: #185568; stroke-width: 1.5; }
+.territory-card__series circle.is-current { fill: #185568; }
+.territory-card__handle { display: none; }
+.mortality-map .mortality-hover-popup, .infra-map .resource-hover-popup { pointer-events: none; font-family: inherit; }
+.mortality-map .mortality-map-status { top: 12px; }
+.mortality-map .mortality-hover-popup .maplibregl-popup-content, .infra-map .resource-hover-popup .maplibregl-popup-content { padding: 0; border: 0; border-radius: 8px; max-height: none; overflow: visible; box-shadow: 0 12px 28px #18343d14, 0 2px 5px #18343d08; }
+.mortality-hover-popup .territory-card, .resource-hover-popup .territory-card { width: 200px; max-width: calc(100vw - 24px); }
+.territory-picker { position: absolute; z-index: 6; top: 148px; right: 10px; font: 400 13px/1.45 Inter, "Segoe UI", Arial, sans-serif; color: #182c36; }
+.territory-picker summary { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #cbd8e3; border-radius: 8px; background: #fff; box-shadow: 0 2px 5px #18343d0d; cursor: pointer; list-style: none; }
+.territory-picker summary::-webkit-details-marker { display: none; }
+.territory-picker form { position: absolute; top: 42px; right: 0; display: grid; gap: 10px; width: min(280px, calc(100vw - 44px)); padding: 16px; background: #fff; border: 1px solid #dce3e5; border-radius: 10px; box-shadow: 0 8px 24px #18343d14; }
+.territory-picker label { font-size: 12px; color: #50636c; }
+.territory-picker :is(select, button) { box-sizing: border-box; width: 100%; min-height: 38px; padding: 8px; border: 1px solid #cbd8e3; border-radius: 6px; background: #fff; color: #182c36; font: inherit; }
+.territory-picker button { background: #eff4f5; cursor: pointer; }
+.territory-card-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.mortality-map-side .site-map-selection-card { padding: 16px; margin-bottom: 16px; border: 1px solid #dce3e5; border-radius: 10px; background: #fff; box-shadow: none; }
+.site-map-selection-card h3 { padding-right: 20px; font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.site-map-selection-card .territory-detail-context { color: #50636c; font-size: 12px; line-height: 1.6; }
+.site-map-selection-card .territory-detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; margin: 20px 0 0; font-size: 13px; }
+.territory-detail-grid dt { color: #50636c; overflow-wrap: anywhere; }
+.territory-detail-grid dd { margin: 0; text-align: right; font-weight: 500; max-width: 150px; overflow-wrap: anywhere; }
+.territory-detail-note { margin: 14px 0 0; color: #50636c; font-size: 12px; }
+.territory-detail-return { margin-top: 18px; padding: 8px 10px; min-height: 36px; border: 1px solid #cbd8e3; border-radius: 6px; background: white; color: #185568; font: inherit; cursor: pointer; }
+@media (max-width: 1023px) {
+  .territory-card-dock { top: auto; bottom: 10px; left: 10px; width: min(280px, calc(100% - 20px)); max-height: calc(100% - 20px); border-radius: 16px; }
+  .infra-map .territory-card-dock { top: auto; max-height: calc(100% - 20px); }
+  .territory-card-dock .territory-card { border-radius: 12px; padding: 12px; }
+  .territory-card-dock .territory-card__handle { display: block; width: 32px; height: 3px; margin: -4px auto 8px; border-radius: 3px; background: #ced8dc; }
+  .territory-card .territory-card__close { width: 40px; height: 40px; top: 9px; right: 8px; }
+  .territory-card .territory-card__details { min-height: 44px; }
+  .territory-picker summary { width: 40px; height: 40px; }
+  .territory-picker { top: 14px; left: 10px; right: auto; }
+  .infra-map .territory-picker { top: 96px; }
+  .territory-picker form { top: 48px; left: 0; right: auto; }
+  .infra-shell:has(.territory-card-dock:not([hidden])) .infra-map-status { top: 96px; bottom: auto; left: 64px; right: 54px; max-width: none; }
+  .territory-picker :is(select, button) { min-height: 44px; }
+  body.hybrid-ui:has(.workspace:not(.drawer-collapsed)) .mortality-map .territory-card-dock,
+  body.hybrid-ui.shell-inspector-open .mortality-map .territory-card-dock,
+  .infra-shell:not(.is-panel-collapsed) .territory-card-dock { visibility: hidden; pointer-events: none; }
+  .territory-card-dock .territory-card__primary { margin: 10px 0; }
+  .territory-card--pinned h3 { padding-right: 40px; }
+  .territory-card-dock .territory-card__close { right: 12px; }
+}
+@media (max-height: 720px) and (max-width: 1023px) {
+  .territory-card-dock .territory-card__series { display: none; }
+}
