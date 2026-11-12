@@ -5,7 +5,7 @@
   "generatedBy": "scripts/build_static_site.cjs",
   "totals": {
     "files": 58,
-    "bytes": 7507051
+    "bytes": 7507387
   },
   "files": [
     {
@@ -120,8 +120,8 @@
     },
     {
       "path": "assets/map-workspace.js",
-      "bytes": 9277,
-      "sha256": "b4ead9c6922acb0b3dd3e371bf585f97b5dc1f172578bc00a9b135cea8a3dd53"
+      "bytes": 9613,
+      "sha256": "eded1513cfdc5bdaaec81401cf48cca7b7c494b97db0a781f75076b55fce1ade"
     },
     {
       "path": "assets/medical-resources.css",
@@ -291,7 +291,7 @@
     {
       "path": "index.html",
       "bytes": 76428,
-      "sha256": "0417b49a565ecc63f39da326a0480b4fce140c1c34db2917f72e2946348ce933"
+      "sha256": "a320f9f940b893450e9135ef27bd250f76462131637b53943fcc48098b107647"
     },
     {
       "path": "manifest.json",

@@ -9,11 +9,14 @@
   const home = document.createComment("Global filters home");
   filters?.before(home);
   let frame = 0, initializedMortality = false, facility = null, lastMedicalMode = null;
+  let medicalInformationOpen = true;
+  const initializedMedicalShells = new WeakSet();
   const notify = () => window.dispatchEvent(new Event("atlas:workspace-panel"));
   const shell = () => document.querySelector("#viz .infra-shell");
   const setInformation = (open, { focus = true } = {}) => {
     const root = shell();
     if (!root || !desktop()) return;
+    medicalInformationOpen = open;
     if (open && !wide()) window.AtlasLegacyBridge?.setInfrastructurePanel(false);
     root.classList.toggle("has-map-information", open);
     const panel = root.querySelector(".map-workspace-information");
@@ -82,14 +85,22 @@
     }
     if (!enabled) return;
     if (view === "map") {
-      if (!initializedMortality) { initializedMortality = true; bridge.setMapPanel("right", false); }
+      const map = document.querySelector("#viz .mortality-map");
+      if (!map) return;
+      if (!initializedMortality) {
+        initializedMortality = true;
+        bridge.setMapPanel("right", true);
+      }
       const info = bridge.getMapChromeSummary();
       if (!wide() && info.leftPanelOpen && info.rightPanelOpen) bridge.setMapPanel("left", false);
-      const map = document.querySelector("#viz .mortality-map");
-      if (map) compactLegend(map, false);
+      compactLegend(map, false);
     } else {
       const root = shell();
       if (!root) return;
+      if (!initializedMedicalShells.has(root)) {
+        initializedMedicalShells.add(root);
+        setInformation(medicalInformationOpen, { focus: false });
+      }
       const mode = bridge.getResourceState().infrastructure;
       if (lastMedicalMode !== mode) { facility = null; lastMedicalMode = mode; }
       if (window.AmurInfrastructureMap?.getSelection?.() != null) facility = null;
