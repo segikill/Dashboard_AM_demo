@@ -1,0 +1,337 @@
+.pyramid-analysis-host {
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 50% 0, rgba(61, 119, 174, .055), transparent 46%),
+    #fbfcfe;
+}
+
+.pyramid-controls__label {
+  display: block;
+  margin: 0 0 6px;
+  color: #47536a;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+
+.pyramid-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 4px;
+  border: 1px solid #d7e0ec;
+  border-radius: 11px;
+  background: #edf2f7;
+}
+
+.pyramid-mode-switch button {
+  display: grid;
+  min-width: 0;
+  min-height: 44px;
+  place-content: center;
+  gap: 1px;
+  padding: 6px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #55657a;
+  cursor: pointer;
+  text-align: center;
+  transition: color 150ms ease, background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.pyramid-mode-switch button span {
+  overflow: hidden;
+  font-size: 9.5px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+}
+
+.pyramid-mode-switch button small {
+  font-size: 7.5px;
+  font-weight: 700;
+  opacity: .72;
+}
+
+.pyramid-mode-switch button:hover {
+  color: #183f72;
+  background: rgba(255, 255, 255, .68);
+}
+
+.pyramid-mode-switch button[aria-pressed="true"] {
+  color: #fff;
+  background: linear-gradient(135deg, #1c5b9f, #2e78c7);
+  box-shadow: 0 4px 12px rgba(35, 93, 158, .22);
+}
+
+.pyramid-mode-switch button:active { transform: translateY(1px); }
+
+.pyramid-control-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 7px;
+}
+
+.pyramid-control-pair .field { min-width: 0; }
+
+.pyramid-control-note {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-left: 3px solid #d89918;
+  border-radius: 8px;
+  background: #fff8e6;
+  color: #6c5726;
+  font-size: 9.5px;
+  line-height: 1.45;
+}
+
+body.pyramid-filters-suspended #ageSelect,
+body.pyramid-filters-suspended #sexSeg {
+  opacity: .48;
+  filter: saturate(.55);
+}
+
+body.pyramid-trend-mode #yearSelect {
+  opacity: .48;
+  filter: saturate(.55);
+}
+
+.pyramid-analysis {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.pyramid-analysis__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 61px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e3e9f1;
+  background: rgba(255, 255, 255, .84);
+  backdrop-filter: blur(8px);
+}
+
+.pyramid-analysis__summary {
+  min-width: 0;
+  flex: 1 1 260px;
+}
+
+.pyramid-analysis__summary strong {
+  display: block;
+  overflow: hidden;
+  color: #17395f;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pyramid-analysis__summary span {
+  display: block;
+  margin-top: 2px;
+  color: #6b788b;
+  font-size: 9.5px;
+}
+
+.pyramid-analysis__highlights {
+  display: flex;
+  flex: 0 1 auto;
+  gap: 5px;
+}
+
+.pyramid-analysis__highlights > span {
+  display: grid;
+  min-width: 92px;
+  padding: 5px 8px;
+  border: 1px solid #e0e7f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.pyramid-analysis__highlights small {
+  color: #7a8798;
+  font-size: 7.5px;
+  font-weight: 750;
+}
+
+.pyramid-analysis__highlights b {
+  margin-top: 1px;
+  color: #263e5c;
+  font-size: 10px;
+}
+
+.pyramid-analysis__highlights .is-male b { color: #2469a6; }
+.pyramid-analysis__highlights .is-female b { color: #bd5875; }
+
+.pyramid-analysis__canvas {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pyramid-analysis-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: visible;
+}
+
+.pyramid-grid {
+  stroke: #e6ebf2;
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+
+.pyramid-axis {
+  stroke: #aebccc;
+  stroke-width: 1.1;
+}
+
+.pyramid-row-guide {
+  stroke: rgba(218, 226, 236, .62);
+  stroke-width: .8;
+  pointer-events: none;
+}
+
+.pyramid-row-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.pyramid-age-row {
+  cursor: pointer;
+  outline: none;
+  transition: opacity 150ms ease;
+}
+
+.pyramid-age-row .pyramid-bar,
+.pyramid-age-row .pyramid-ratio-pill {
+  transition: filter 150ms ease, opacity 150ms ease, stroke-width 150ms ease;
+}
+
+.pyramid-age-row.is-active .pyramid-bar--current {
+  filter: drop-shadow(0 2px 3px rgba(25, 57, 91, .22));
+  stroke: rgba(19, 48, 78, .58);
+  stroke-width: 1.15;
+}
+
+.pyramid-bar--male { fill: #4d8ec8; }
+.pyramid-bar--female { fill: #dc7893; }
+.pyramid-bar--current { opacity: .96; }
+
+.pyramid-bar--baseline {
+  fill-opacity: .12;
+  stroke-width: 1.35;
+  stroke-dasharray: 3 2;
+}
+
+.pyramid-bar--baseline.pyramid-bar--male { stroke: #2d75b4; }
+.pyramid-bar--baseline.pyramid-bar--female { stroke: #ca5f7e; }
+
+.pyramid-sex-title {
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.pyramid-sex-title.is-male { fill: #2469a6; }
+
+.pyramid-sex-title.is-female { fill: #bd5875; }
+
+.pyramid-age-title {
+  fill: #718095;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.pyramid-age-label {
+  fill: #354861;
+  font-size: 9px;
+  font-weight: 850;
+  pointer-events: none;
+}
+
+.pyramid-value-label {
+  fill: #52657b;
+  font-size: 8.5px;
+  font-weight: 750;
+  pointer-events: none;
+}
+
+.pyramid-scale-label {
+  fill: #7a8798;
+  font-size: 7.5px;
+  font-weight: 650;
+}
+
+.pyramid-ratio-pill {
+  fill: rgba(54, 101, 146, .1);
+  stroke: rgba(54, 101, 146, .2);
+  stroke-width: .7;
+}
+
+.pyramid-ratio-pill.is-female {
+  fill: rgba(211, 100, 132, .11);
+  stroke: rgba(190, 78, 112, .22);
+}
+
+.pyramid-ratio-text {
+  fill: #52657a;
+  font-size: 6.8px;
+  font-weight: 850;
+  pointer-events: none;
+}
+
+.pyramid-analysis__footnote {
+  padding: 8px 13px 9px;
+  border-top: 1px solid #e6ebf2;
+  background: rgba(249, 251, 253, .92);
+  color: #6d7a8c;
+  font-size: 8.5px;
+  line-height: 1.35;
+}
+
+.pyramid-analysis__empty {
+  display: grid;
+  min-height: 520px;
+  place-items: center;
+  padding: 30px;
+  color: #6d7a8c;
+  text-align: center;
+}
+
+.hybrid-inspector__metric .is-male { color: #2469a6; }
+.hybrid-inspector__metric .is-female { color: #bd5875; }
+
+@media (min-width: 1900px) {
+  .pyramid-sex-title { font-size: 12px; }
+  .pyramid-age-label { font-size: 10px; }
+  .pyramid-value-label { font-size: 9px; }
+}
+
+@media (max-width: 1320px) {
+  .pyramid-analysis__highlights > span { min-width: 78px; }
+  .pyramid-analysis__highlights small { font-size: 7px; }
+  .pyramid-analysis__highlights b { font-size: 9px; }
+  .pyramid-control-pair { grid-template-columns: 1fr; gap: 0; }
+}
+
+@media (max-width: 980px) {
+  .pyramid-analysis__highlights { width: 100%; }
+  .pyramid-analysis__highlights > span { flex: 1; }
+}
+
+body[data-motion="off"] .pyramid-age-row,
+body[data-motion="off"] .pyramid-age-row .pyramid-bar,
+body[data-motion="off"] .pyramid-mode-switch button { transition: none !important; }

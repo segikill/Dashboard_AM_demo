@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "region": "amur",
+  "version": "2026-11-03.2",
+  "mode": "reference_context",
+  "requiresReferenceSha256": "e1022f47a0b1260e934c37f997c98d68730a5efebcd9d1ba6530c3b7022dae20",
+  "resources": [
+    {
+      "path": "municipal-population.json",
+      "sha256": "085472f9e28bb6714e42ce66e63d9dd42377c78a75347e1ec62bd96651a6d078",
+      "bytes": 30594
+    },
+    {
+      "path": "municipal-context.json",
+      "sha256": "b9577c667005d82ae66683646ce03999386b4b7abc0b4540d7eb1068d7b41dd4",
+      "bytes": 1439015
+    }
+  ],
+  "enabledInCurrentSite": true,
+  "populationRateUse": false
+}

@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "15f2c67-local-demo",
+  "entrypoint": "index.html",
+  "generatedBy": "scripts/build_static_site.cjs",
+  "totals": {
+    "files": 58,
+    "bytes": 7507051
+  },
+  "files": [
+    {
+      "path": "assets/analytics/atlas-analytics-core.js",
+      "bytes": 25301,
+      "sha256": "93b4a03eac445d05022875499599e2bc01decbee257b9c2147c279394c6076a8"
+    },
+    {
+      "path": "assets/app-shell.css",
+      "bytes": 26848,
+      "sha256": "4e3b3185cb13e3866d07b427fffbda7a3cb31d0738c992329c0471bde759c47e"
+    },
+    {
+      "path": "assets/app-shell.js",
+      "bytes": 8589,
+      "sha256": "fc770f329198ce2929d62b7beb7e612d07bfd098216d23619c3ef33e9788f581"
+    },
+    {
+      "path": "assets/basemap.js",
+      "bytes": 4979,
+      "sha256": "5810682f277d570b27bf191e8a1be86829e37178703355902ab99167b4d44a36"
+    },
+    {
+      "path": "assets/dotogram-analysis.js",
+      "bytes": 10062,
+      "sha256": "b1343f868a2f16a1b193329e380f280c23dd364ac3f13dddf90ed428d93d505d"
+    },
+    {
+      "path": "assets/dotogram-react.css",
+      "bytes": 5129,
+      "sha256": "1ce1caf8fcf530c83e831887b7bc621c22b3a9c21b90deb29def1b4f0b6a38ab"
+    },
+    {
+      "path": "assets/heatmap-v2.css",
+      "bytes": 7402,
+      "sha256": "4bfd906e9e5a95d6cee587613741cf6872c7006e4dc3d2d5fe0fc9b5f8e5f649"
+    },
+    {
+      "path": "assets/heatmap-v2.js",
+      "bytes": 11665,
+      "sha256": "4bf0c67aa03ba7b6403ce1383f38bd0d9abe65894b6a87af4020285dc5a3c0ea"
+    },
+    {
+      "path": "assets/hybrid-interface.css",
+      "bytes": 17058,
+      "sha256": "51548b7e7444d9f812cfad8d5065f3b0a4241f42a382a8c3cfc5b43990b6b412"
+    },
+    {
+      "path": "assets/hybrid-interface.js",
+      "bytes": 19155,
+      "sha256": "49d1353bca219d3dbe83324258fd9f07bda558630cbabc965d10a87f02f7ff74"
+    },
+    {
+      "path": "assets/icons/medical-facilities/ambulatory.svg",
+      "bytes": 851,
+      "sha256": "c2309aa079da688b39912e7279d5e917ec79c6ab02170f56fe5d44c576159b99"
+    },
+    {
+      "path": "assets/icons/medical-facilities/consultation.svg",
+      "bytes": 930,
+      "sha256": "93823f427b113efdfa1a5d716f23f10f2c97c5cd5b603978bb288650c134cee2"
+    },
+    {
+      "path": "assets/icons/medical-facilities/fap.svg",
+      "bytes": 503,
+      "sha256": "9ccb59d8f3738de848509fcee6a4e7507c13c49cd89bcd82fafcde604503e9e0"
+    },
+    {
+      "path": "assets/icons/medical-facilities/health-post.svg",
+      "bytes": 468,
+      "sha256": "41358c711fd624c9039123fd286649e5886f3af49f88d1da07de9aabfafbbd10"
+    },
+    {
+      "path": "assets/icons/medical-facilities/hospital.svg",
+      "bytes": 539,
+      "sha256": "f7e35e6e4098cc35248603d68ab5816d66fa378a32609751596e2a8f7eaa72c1"
+    },
+    {
+      "path": "assets/icons/medical-facilities/maternity.svg",
+      "bytes": 1396,
+      "sha256": "aa0a8cad3605dacee14b799c65d75a5c30b384a084f5cd6d0917c9b8ff21a74d"
+    },
+    {
+      "path": "assets/icons/medical-facilities/polyclinic.svg",
+      "bytes": 681,
+      "sha256": "3692b2129d07911730d6535dcad4be895886f341b903fce4ad4250b4effb74cc"
+    },
+    {
+      "path": "assets/icons/medical-facilities/rehabilitation.svg",
+      "bytes": 1123,
+      "sha256": "04e0c1c8ef0da78fd583f03748ac90e43aca79ffa09d6f81096e6b65fcc0ac1a"
+    },
+    {
+      "path": "assets/infrastructure-map.css",
+      "bytes": 24193,
+      "sha256": "b845092a50548b4ea1e6b6f51416eeaa7f686e89e0ce5d3029be173580b984ad"
+    },
+    {
+      "path": "assets/infrastructure-map.js",
+      "bytes": 66540,
+      "sha256": "3f7ed5ae2e4cb5515893ac1c5d5f7ee4cbf867428dcff9510333983fb01ba94c"
+    },
+    {
+      "path": "assets/interaction-mode.js",
+      "bytes": 4252,
+      "sha256": "9f71d5ef5593d919b7c3756e5f2a8303b9b7d166025ecafb7506c5d10a949b3c"
+    },
+    {
+      "path": "assets/map-workspace.css",
+      "bytes": 12669,
+      "sha256": "e4c2ef8d53bae138d9536c0e25cda32c3e46a177ac7e1a5a3be5391c1b749974"
+    },
+    {
+      "path": "assets/map-workspace.js",
+      "bytes": 9277,
+      "sha256": "b4ead9c6922acb0b3dd3e371bf585f97b5dc1f172578bc00a9b135cea8a3dd53"
+    },
+    {
+      "path": "assets/medical-resources.css",
+      "bytes": 7903,
+      "sha256": "b06fa8c2fb015bac8af54566065224b9a658d046f913b9be31a727522ea3049c"
+    },
+    {
+      "path": "assets/mortality-map.css",
+      "bytes": 7937,
+      "sha256": "61d635fe7f1023e920521a350919f1c638e4ac29f60bf94e6c8efec1d32ebc9b"
+    },
+    {
+      "path": "assets/mortality-map.js",
+      "bytes": 35796,
+      "sha256": "c89c96c3437943e6795097ebf96005e67231a009920881a8d8ce71cc0773886e"
+    },
+    {
+      "path": "assets/municipal-context.css",
+      "bytes": 1418,
+      "sha256": "05354a26cd5d97287a572b3841e305e9816398a9d7bd1a1b0c00e0d110fb5169"
+    },
+    {
+      "path": "assets/pyramid-analysis.css",
+      "bytes": 6810,
+      "sha256": "8fd8c27b6565f4256944b1f8c43e404fc6917039e6854f23eea45b6113c5cddd"
+    },
+    {
+      "path": "assets/pyramid-analysis.js",
+      "bytes": 24859,
+      "sha256": "7456ba8e36fbf69bb6701e00ce15ea0a6dcd7b2ca24c487e708afc4d4b199039"
+    },
+    {
+      "path": "assets/pyramid-react.css",
+      "bytes": 6358,
+      "sha256": "b54dea5506074b5f8707adc3f5f399ce91fc1c86cc1df85b80d494fac2087a3a"
+    },
+    {
+      "path": "assets/rank-analysis.css",
+      "bytes": 10947,
+      "sha256": "aec3d2df598b170e0fed2c45ea47d27c368b98411655f0c79354d6328249f306"
+    },
+    {
+      "path": "assets/rank-analysis.js",
+      "bytes": 32817,
+      "sha256": "809638d1756326097cebe515bac46ec78713f006f84a776780d271c479b519b9"
+    },
+    {
+      "path": "assets/rank-react.css",
+      "bytes": 6977,
+      "sha256": "11a76ef6376cf4bedffabd2bb34cc670c252624ff763d2126776047d45ca2018"
+    },
+    {
+      "path": "assets/react-legacy-bridge.js",
+      "bytes": 29855,
+      "sha256": "d1a13f17fe7373b17a8375a1e18d2a7554aec4783c078126011c6efc5f756da2"
+    },
+    {
+      "path": "assets/react/atlas-hybrid.js",
+      "bytes": 362474,
+      "sha256": "8d9dcf7bf2eba22a76b42739437115d9f938e4d43d7eaeada7f66e666f3a0877"
+    },
+    {
+      "path": "assets/readable-interface.css",
+      "bytes": 10691,
+      "sha256": "a4bf187aad1f4122b21bddce50cd4a963eb3a4f8a3750e93c282bb0aedb5b6ec"
+    },
+    {
+      "path": "assets/responsive-interface.css",
+      "bytes": 14254,
+      "sha256": "2a0d2a974202a10871947895d9c96868cab820df7d16afd5c2e54b171b3400b2"
+    },
+    {
+      "path": "assets/responsive-interface.js",
+      "bytes": 6777,
+      "sha256": "55b5396e275489519ab90dd56c22270d9e9bc5dbb91d828f4d1859872a3b02a3"
+    },
+    {
+      "path": "assets/site.css",
+      "bytes": 43327,
+      "sha256": "1620a2fbc67a5128348a934447bbbb299a730a09a0ccbbbb4eb6222ccf7b54f2"
+    },
+    {
+      "path": "assets/site.js",
+      "bytes": 141804,
+      "sha256": "514653b39a601dec8705aa79cfe050691071b295988ad82bc165dccce74c3645"
+    },
+    {
+      "path": "assets/territory-card.css",
+      "bytes": 8945,
+      "sha256": "224edca28e66896b1eb819bd426fa0b032cd695ff049651bd5d7e14cba45f093"
+    },
+    {
+      "path": "assets/territory-card.js",
+      "bytes": 9255,
+      "sha256": "24d40716af373f3cf6a2699bf3e8602a2af936881d7bec2dfa9148b9bb835954"
+    },
+    {
+      "path": "assets/treemap-v2.css",
+      "bytes": 20264,
+      "sha256": "4e14ad315205de26fd2b5aaf6086e95192d5c8f965302d061d9b4d0dbed29862"
+    },
+    {
+      "path": "assets/treemap-v2.js",
+      "bytes": 32032,
+      "sha256": "084d397975a09631898a2d6f0e6a079950025538ece0bb2cadbd871a7d1d06d8"
+    },
+    {
+      "path": "assets/vendor/maplibre-gl/5.24.0/LICENSE.txt",
+      "bytes": 5984,
+      "sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2"
+    },
+    {
+      "path": "assets/vendor/maplibre-gl/5.24.0/maplibre-gl.css",
+      "bytes": 70024,
+      "sha256": "ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732"
+    },
+    {
+      "path": "assets/vendor/maplibre-gl/5.24.0/maplibre-gl.js",
+      "bytes": 1056837,
+      "sha256": "45a9b07a9189ce56054c620a947ccf41e291e58c95e9b61533b740aaa65ee5cb"
+    },
+    {
+      "path": "data/atlas-data.js",
+      "bytes": 4044,
+      "sha256": "b6a36df576533859094dc0fee212700af1997cf482e4953267c4c8a4141f8c57"
+    },
+    {
+      "path": "data/atlas-reference.js",
+      "bytes": 171959,
+      "sha256": "f72e852ad54e9ec6db87b58d223a474a5f96c537eaa48c0665cdebb3b172f2a5"
+    },
+    {
+      "path": "data/atlas-spatial.js",
+      "bytes": 195944,
+      "sha256": "689158da8208dfa594ed8bcfd2d3cbf7227479ef1b2a8c34ff91eb6e48a37c6f"
+    },
+    {
+      "path": "data/demo-bulletin.js",
+      "bytes": 949,
+      "sha256": "8a10ea5c34b38fd7a93b94c4e40f0bbc45d426789b2b38b2aa0ae7ec66113d34"
+    },
+    {
+      "path": "data/infrastructure-data.js",
+      "bytes": 1092680,
+      "sha256": "3db472f7fc21926be0a5b9b8565e3e410155ca61b636da59030e08ae813448b1"
+    },
+    {
+      "path": "data/municipal-context.json",
+      "bytes": 1439015,
+      "sha256": "b9577c667005d82ae66683646ce03999386b4b7abc0b4540d7eb1068d7b41dd4"
+    },
+    {
+      "path": "data/municipal-data.manifest.json",
+      "bytes": 606,
+      "sha256": "2a09ac67745435a064208c2976a423d67b24a695a28d9ae4aad3a01d05eed191"
+    },
+    {
+      "path": "data/municipal-population.json",
+      "bytes": 30594,
+      "sha256": "085472f9e28bb6714e42ce66e63d9dd42377c78a75347e1ec62bd96651a6d078"
+    },
+    {
+      "path": "data/roads-data.js",
+      "bytes": 2280583,
+      "sha256": "d591b5212c3ec2a44606df1134343a84a8190c1161e1092a02bc7713d154724d"
+    },
+    {
+      "path": "index.html",
+      "bytes": 76428,
+      "sha256": "0417b49a565ecc63f39da326a0480b4fce140c1c34db2917f72e2946348ce933"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 294,
+      "sha256": "84babdf82cdf63bb5c337e6c723b3dee93399278a701debdb728479ebac18031"
+    }
+  ]
+}

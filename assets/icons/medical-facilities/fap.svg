@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="title">
+  <title id="title">Фельдшерско-акушерский пункт</title>
+  <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="7" fill="#D97706" stroke="#0F2740" stroke-opacity=".28" stroke-width=".75"/>
+  <path fill="#fff" d="m5 14.2 11-8.4 11 8.4-1.8 2.3-1.7-1.3v11.3h-15V15.2l-1.7 1.3L5 14.2Z"/>
+  <path fill="#D97706" d="M14.5 11h3v3h3v3h-3v3h-3v-3h-3v-3h3v-3Zm-3 11h3v4.5h-3V22Z"/>
+</svg>

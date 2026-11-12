@@ -1,0 +1,1123 @@
+/* Treemap v2: explicit hierarchy + permanent analytical inspector. */
+body.app-interface-v2[data-shell-view="treemap"] .atlas-main {
+  --controls-w: 260px;
+}
+
+body.app-interface-v2 #viz[data-view="treemap"] {
+  overflow: hidden;
+  background: #f4f7fb;
+}
+
+.treev2-controls {
+  display: grid;
+  gap: 7px;
+}
+
+.treev2-levels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid #d8e2ef;
+  border-radius: 10px;
+  background: #f5f8fc;
+}
+
+.treev2-level-button {
+  display: grid;
+  min-width: 0;
+  min-height: 47px;
+  place-items: center;
+  gap: 1px;
+  padding: 5px 2px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #53657c;
+  cursor: pointer;
+  text-align: center;
+}
+
+.treev2-level-button b {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e3eaf4;
+  color: #49617e;
+  font-size: 9px;
+}
+
+.treev2-level-button span {
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+}
+
+.treev2-level-button.active {
+  border-color: #2c6fc2;
+  background: linear-gradient(145deg, #347bc9, #215caa);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(34, 93, 171, .2);
+}
+
+.treev2-level-button.active b {
+  background: rgba(255, 255, 255, .22);
+  color: #fff;
+}
+
+.treev2-context {
+  margin: 0;
+  color: #6c7a8e;
+  font-size: 8px;
+  line-height: 1.35;
+}
+
+.treev2-controls .field {
+  position: relative;
+}
+
+.treev2-controls .field small {
+  display: block;
+  margin-top: 4px;
+  color: #7b8798;
+  font-size: 7.5px;
+  line-height: 1.35;
+}
+
+.treev2-check {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border: 1px solid #d8e2ef;
+  border-radius: 9px;
+  background: #fff;
+  color: #394b63;
+  cursor: pointer;
+  font-size: 8.5px;
+  font-weight: 800;
+}
+
+.treev2-check input {
+  width: 14px !important;
+  height: 14px;
+  min-height: 0 !important;
+  margin: 0;
+  accent-color: #2d6cbd;
+}
+
+.treev2-range-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.treev2-range-head output {
+  color: #1f5ea9;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.treev2-controls input[type="range"] {
+  min-height: 22px !important;
+  padding: 0;
+  accent-color: #2d6cbd;
+}
+
+.treev2-reset {
+  min-height: 33px;
+  border: 1px solid #b9cbe0;
+  border-radius: 9px;
+  background: #f7faff;
+  color: #245b9e;
+  cursor: pointer;
+  font-size: 8.5px;
+  font-weight: 900;
+}
+
+.treev2-reset:hover,
+.treev2-reset:focus-visible {
+  border-color: #2d6cbd;
+  background: #eaf2fc;
+}
+
+.treemap-v2-layout {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) 286px;
+  overflow: hidden;
+  background: #f4f7fb;
+}
+
+.treev2-stage {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  border-right: 1px solid #d9e2ee;
+  background: #fff;
+}
+
+.treev2-pathbar {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #dce4ef;
+  background: linear-gradient(180deg, #fff, #f8fafc);
+}
+
+.treev2-breadcrumbs {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+}
+
+.treev2-crumb {
+  min-width: 0;
+  max-width: 250px;
+  padding: 5px 8px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 7px;
+  background: #eaf1f9;
+  color: #2c5c95;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.treev2-crumb.current {
+  background: #153f70;
+  color: #fff;
+}
+
+.treev2-chevron {
+  flex: 0 0 auto;
+  color: #94a2b5;
+  font-size: 11px;
+}
+
+.treev2-path-help {
+  flex: 0 0 auto;
+  color: #718096;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.treev2-canvas {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  margin: 8px;
+  overflow: hidden;
+  border: 1px solid #d7e0ec;
+  border-radius: 11px;
+  background: #edf2f7;
+  box-shadow: inset 0 1px 3px rgba(18, 45, 78, .06);
+}
+
+.treev2-canvas .tile {
+  border: 1.5px solid rgba(255, 255, 255, .92);
+  border-radius: 3px;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  transition: filter .12s ease, box-shadow .12s ease, transform .12s ease;
+}
+
+.treev2-canvas .tile:hover,
+.treev2-canvas .tile:focus-visible {
+  z-index: 4;
+  filter: brightness(1.07);
+  outline: 2px solid rgba(226, 193, 118, .95);
+  outline-offset: -3px;
+}
+
+.treev2-canvas .tile.is-selected {
+  z-index: 5;
+  outline: 3px solid #dfbd70;
+  outline-offset: -4px;
+  box-shadow: inset 0 0 0 1px rgba(13, 42, 76, .35), 0 4px 12px rgba(24, 54, 88, .22);
+}
+
+.treev2-canvas .tile-inner {
+  padding: clamp(5px, .6vw, 10px);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .38);
+}
+
+.treev2-canvas .tile-code {
+  display: block;
+  margin-bottom: 2px;
+  font-size: clamp(10px, .78vw, 14px);
+  font-weight: 950;
+  letter-spacing: .01em;
+}
+
+.treev2-canvas .tile-label {
+  font-size: clamp(9px, .72vw, 13px);
+  font-weight: 750;
+  line-height: 1.16;
+}
+
+.treev2-canvas .tile-value {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 7px;
+  font-size: clamp(8px, .61vw, 11px);
+}
+
+.treev2-canvas .tile-value b {
+  font-size: 1.12em;
+}
+
+.treev2-canvas .tile.tiny .tile-code {
+  margin: 0;
+  font-size: 9px;
+}
+
+.treev2-canvas .tile.tiny .tile-label,
+.treev2-canvas .tile.tiny .tile-value {
+  display: none;
+}
+
+.treev2-canvas .tile.small .tile-label {
+  font-size: 8.5px;
+  -webkit-line-clamp: 2;
+}
+
+.treev2-canvas .tile.small .tile-value {
+  font-size: 7.5px;
+}
+
+.treev2-inspector {
+  min-width: 0;
+  min-height: 0;
+  padding: 10px;
+  overflow: auto;
+  background: #f8fafc;
+  scrollbar-width: thin;
+}
+
+.treev2-inspector-section {
+  margin-bottom: 8px;
+  padding: 10px;
+  border: 1px solid #dbe3ee;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(30, 57, 88, .04);
+}
+
+.treev2-inspector-kicker {
+  display: block;
+  margin-bottom: 5px;
+  color: #78869a;
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.treev2-selection-head {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.treev2-swatch {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(20, 49, 83, .12);
+  border-radius: 8px;
+}
+
+.treev2-selection-head h3 {
+  margin: 0;
+  color: #172c47;
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.treev2-selection-head p {
+  display: -webkit-box;
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: #56677d;
+  font-size: 9px;
+  line-height: 1.2;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.treev2-primary {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin: 10px 0 2px;
+}
+
+.treev2-primary strong {
+  color: #143e70;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.treev2-primary span {
+  color: #6c7b8f;
+  font-size: 8px;
+}
+
+.treev2-metrics {
+  display: grid;
+  margin-top: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.treev2-metric {
+  min-width: 0;
+  padding: 6px 7px;
+  border-radius: 8px;
+  background: #f4f7fb;
+}
+
+.treev2-metric span {
+  display: block;
+  color: #758398;
+  font-size: 7px;
+  line-height: 1.15;
+}
+
+.treev2-metric b {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #243b59;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.treev2-change.positive {
+  color: #b94f43;
+}
+
+.treev2-change.negative {
+  color: #27806b;
+}
+
+.treev2-sparkline-wrap {
+  display: grid;
+  margin-top: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.treev2-sparkline-wrap svg {
+  display: block;
+  width: 100%;
+  height: 34px;
+  overflow: visible;
+}
+
+.treev2-sparkline-wrap small {
+  color: #77869a;
+  font-size: 7px;
+  line-height: 1.2;
+  text-align: right;
+}
+
+.treev2-drill {
+  width: 100%;
+  min-height: 34px;
+  margin-top: 9px;
+  border: 0;
+  border-radius: 9px;
+  background: linear-gradient(145deg, #3478c9, #205ca9);
+  color: #fff;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 900;
+  box-shadow: 0 5px 12px rgba(32, 92, 169, .2);
+}
+
+.treev2-drill:hover,
+.treev2-drill:focus-visible {
+  filter: brightness(1.08);
+}
+
+.treev2-inspector h4 {
+  margin: 0 0 7px;
+  color: #243b59;
+  font-size: 10px;
+}
+
+.treev2-legend-bar {
+  display: grid;
+  height: 9px;
+  grid-template-columns: repeat(5, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(26, 54, 88, .08);
+  border-radius: 99px;
+}
+
+.treev2-legend-copy {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 4px;
+  color: #758398;
+  font-size: 7px;
+}
+
+.treev2-rank-list {
+  display: grid;
+  gap: 4px;
+}
+
+.treev2-rank {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 5px;
+  align-items: center;
+  padding: 5px 6px;
+  border: 1px solid #e0e7f0;
+  border-radius: 8px;
+  background: #fbfcfe;
+  color: #2e425d;
+  cursor: pointer;
+  text-align: left;
+}
+
+.treev2-rank:hover,
+.treev2-rank:focus-visible {
+  border-color: #8db1da;
+  background: #eef5fd;
+}
+
+.treev2-rank-index {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8eef6;
+  color: #5f7289;
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.treev2-rank-name {
+  min-width: 0;
+}
+
+.treev2-rank-name b,
+.treev2-rank-name span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.treev2-rank-name b {
+  font-size: 8.5px;
+}
+
+.treev2-rank-name span {
+  color: #78869a;
+  font-size: 7px;
+}
+
+.treev2-rank-value {
+  color: #1e568f;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.treev2-empty {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  padding: 30px;
+  color: #68778b;
+  text-align: center;
+}
+
+/* React islands for stage 4.2. Legacy siblings remain visible until ownership is acquired. */
+.react-treemap-controls-host[hidden],
+.react-treemap-breadcrumbs-host[hidden],
+.react-treemap-inspector-host[hidden] {
+  display: none !important;
+}
+
+.drawer-scroll.is-react-treemap-owned > [data-legacy-local-controls],
+.treev2-pathbar.is-react-owned > [data-legacy-treemap-breadcrumbs],
+.treev2-inspector.is-react-owned > [data-legacy-treemap-inspector] {
+  display: none !important;
+}
+
+.drawer-scroll.is-react-treemap-owned > .react-treemap-controls-host,
+.treev2-pathbar.is-react-owned > .react-treemap-breadcrumbs-host,
+.treev2-inspector.is-react-owned > .react-treemap-inspector-host {
+  display: block;
+  min-width: 0;
+}
+
+.react-tree-controls {
+  display: grid;
+  gap: 7px;
+  padding-top: 10px;
+  border-top: 1px dashed #d8dfeb;
+}
+
+.react-tree-levels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid #d8e2ef;
+  border-radius: 10px;
+  background: #f5f8fc;
+}
+
+.react-tree-levels button {
+  display: grid;
+  min-width: 0;
+  min-height: 47px;
+  place-items: center;
+  gap: 1px;
+  padding: 5px 2px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #53657c;
+  cursor: pointer;
+}
+
+.react-tree-levels button b {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e3eaf4;
+  font-size: 9px;
+}
+
+.react-tree-levels button span {
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.react-tree-levels button.active {
+  border-color: #2c6fc2;
+  background: linear-gradient(145deg, #347bc9, #215caa);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(34, 93, 171, .2);
+}
+
+.react-tree-levels button.active b {
+  background: rgba(255, 255, 255, .22);
+}
+
+.react-tree-context {
+  margin: 0;
+  color: #6c7a8e;
+  font-size: 8px;
+  line-height: 1.35;
+}
+
+.react-tree-field,
+.react-tree-range {
+  display: grid;
+  gap: 4px;
+  color: #47536a;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.react-tree-field select {
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 8px;
+  border: 1px solid #cfd7e5;
+  border-radius: 8px;
+  background: #fff;
+  color: #172033;
+  font-size: 9px;
+}
+
+.react-tree-check {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border: 1px solid #d8e2ef;
+  border-radius: 9px;
+  background: #fff;
+  color: #394b63;
+  cursor: pointer;
+  font-size: 8.5px;
+  font-weight: 800;
+}
+
+.react-tree-check input {
+  width: 14px !important;
+  height: 14px;
+  min-height: 0 !important;
+  margin: 0;
+  accent-color: #2d6cbd;
+}
+
+.react-tree-range > span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.react-tree-range output {
+  color: #1f5ea9;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.react-tree-range input {
+  min-height: 22px !important;
+  padding: 0;
+  accent-color: #2d6cbd;
+}
+
+.react-tree-range small {
+  color: #7b8798;
+  font-size: 7.5px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.react-tree-reset {
+  min-height: 33px;
+  border: 1px solid #b9cbe0;
+  border-radius: 9px;
+  background: #f7faff;
+  color: #245b9e;
+  cursor: pointer;
+  font-size: 8.5px;
+  font-weight: 900;
+}
+
+.react-tree-path {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.react-tree-path nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+}
+
+.react-tree-path nav > span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 3px;
+}
+
+.react-tree-path button {
+  min-width: 0;
+  max-width: 250px;
+  padding: 5px 8px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 7px;
+  background: #eaf1f9;
+  color: #2c5c95;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.react-tree-path button.current {
+  background: #153f70;
+  color: #fff;
+}
+
+.react-tree-path i {
+  color: #94a2b5;
+  font-style: normal;
+}
+
+.react-tree-path > small {
+  flex: 0 0 auto;
+  color: #718096;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.react-tree-inspector {
+  display: grid;
+  gap: 8px;
+}
+
+.react-tree-inspector-section {
+  padding: 10px;
+  border: 1px solid #dbe3ee;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(30, 57, 88, .04);
+}
+
+.react-tree-kicker {
+  display: block;
+  margin-bottom: 5px;
+  color: #78869a;
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.react-tree-selection {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.react-tree-selection > span {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(20, 49, 83, .12);
+  border-radius: 8px;
+}
+
+.react-tree-selection h3,
+.react-tree-inspector h4 {
+  margin: 0;
+  color: #172c47;
+  font-size: 12px;
+}
+
+.react-tree-selection p {
+  display: -webkit-box;
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: #56677d;
+  font-size: 9px;
+  line-height: 1.2;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.react-tree-primary {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin: 10px 0 2px;
+}
+
+.react-tree-primary strong {
+  color: #143e70;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.react-tree-primary span,
+.react-tree-sparkline small,
+.react-tree-legend-copy {
+  color: #6c7b8f;
+  font-size: 8px;
+}
+
+.react-tree-metrics {
+  display: grid;
+  margin-top: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.react-tree-metrics > div {
+  min-width: 0;
+  padding: 6px 7px;
+  border-radius: 8px;
+  background: #f4f7fb;
+}
+
+.react-tree-metrics span,
+.react-tree-ranks small {
+  display: block;
+  overflow: hidden;
+  color: #758398;
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.react-tree-metrics b {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #243b59;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.react-tree-sparkline {
+  display: grid;
+  margin-top: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.react-tree-sparkline svg {
+  display: block;
+  width: 100%;
+  height: 34px;
+}
+
+.react-tree-sparkline small {
+  line-height: 1.2;
+  text-align: right;
+}
+
+.react-tree-drill {
+  width: 100%;
+  min-height: 34px;
+  margin-top: 9px;
+  border: 0;
+  border-radius: 9px;
+  background: linear-gradient(145deg, #3478c9, #205ca9);
+  color: #fff;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.react-tree-inspector h4 {
+  margin-bottom: 7px;
+  font-size: 10px;
+}
+
+.react-tree-color-scale {
+  display: grid;
+  height: 9px;
+  grid-template-columns: repeat(5, 1fr);
+  overflow: hidden;
+  border-radius: 99px;
+}
+
+.react-tree-color-scale span {
+  background: var(--tree-color);
+}
+
+.react-tree-color-scale span:nth-child(1) { filter: brightness(.55); }
+.react-tree-color-scale span:nth-child(2) { filter: brightness(.72); }
+.react-tree-color-scale span:nth-child(3) { filter: brightness(.9); }
+.react-tree-color-scale span:nth-child(4) { filter: brightness(1.08); }
+.react-tree-color-scale span:nth-child(5) { filter: brightness(1.24); }
+.react-tree-color-scale--count span:nth-child(n) { filter: none; }
+.react-tree-color-scale--count span:nth-child(1) { background: color-mix(in srgb, var(--tree-color), white 8%); }
+.react-tree-color-scale--count span:nth-child(2) { background: color-mix(in srgb, var(--tree-color), white 6%); }
+.react-tree-color-scale--count span:nth-child(3) { background: color-mix(in srgb, var(--tree-color), white 4%); }
+.react-tree-color-scale--count span:nth-child(4) { background: color-mix(in srgb, var(--tree-color), white 2%); }
+.react-tree-color-scale--count span:nth-child(5) { background: var(--tree-color); }
+
+.react-tree-legend-copy {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 7px;
+}
+
+.react-tree-ranks {
+  display: grid;
+  gap: 4px;
+}
+
+.react-tree-ranks button {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 5px;
+  align-items: center;
+  padding: 5px 6px;
+  border: 1px solid #e0e7f0;
+  border-radius: 8px;
+  background: #fbfcfe;
+  color: #2e425d;
+  cursor: pointer;
+  text-align: left;
+}
+
+.react-tree-ranks button > span:first-child {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8eef6;
+  color: #5f7289;
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.react-tree-ranks b,
+.react-tree-ranks strong {
+  font-size: 8.5px;
+}
+
+.react-tree-ranks strong {
+  color: #1e568f;
+}
+
+.react-tree-ranks p {
+  margin: 0;
+  color: #6c7a8e;
+  font-size: 8px;
+}
+
+@media (max-width: 1540px) {
+  body.app-interface-v2[data-shell-view="treemap"] .atlas-main {
+    --controls-w: 238px;
+  }
+
+  .treemap-v2-layout {
+    grid-template-columns: minmax(0, 1fr) 258px;
+  }
+
+  .treev2-inspector {
+    padding: 7px;
+  }
+
+  .treev2-inspector-section {
+    padding: 8px;
+  }
+
+  .treev2-path-help {
+    display: none;
+  }
+
+  .react-tree-path > small {
+    display: none;
+  }
+}
+
+@media (min-width: 2200px) {
+  body.app-interface-v2[data-shell-view="treemap"] .atlas-main {
+    --controls-w: 294px;
+  }
+
+  .treemap-v2-layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+
+  .treev2-level-button span,
+  .treev2-context,
+  .treev2-check {
+    font-size: 10px;
+  }
+
+  .treev2-inspector {
+    padding: 13px;
+  }
+
+  .treev2-inspector-section {
+    padding: 13px;
+  }
+
+  .treev2-selection-head h3 {
+    font-size: 15px;
+  }
+
+  .treev2-selection-head p {
+    font-size: 11px;
+  }
+
+  .treev2-canvas .tile-code {
+    font-size: 15px !important;
+  }
+
+  .treev2-canvas .tile-label {
+    font-size: 14px !important;
+  }
+
+  .treev2-canvas .tile-value {
+    font-size: 12px !important;
+  }
+
+  .treev2-primary strong {
+    font-size: 28px;
+  }
+
+  .treev2-primary span,
+  .treev2-metric span,
+  .treev2-rank-name span,
+  .treev2-legend-copy {
+    font-size: 9px;
+  }
+
+  .treev2-metric b,
+  .treev2-inspector h4,
+  .treev2-rank-name b,
+  .treev2-rank-value {
+    font-size: 11px;
+  }
+
+  .treev2-crumb,
+  .treev2-path-help {
+    font-size: 10px;
+  }
+
+  .react-tree-levels button span,
+  .react-tree-context,
+  .react-tree-check {
+    font-size: 10px;
+  }
+
+  .react-tree-selection h3 {
+    font-size: 15px;
+  }
+
+  .react-tree-selection p,
+  .react-tree-metrics b,
+  .react-tree-inspector h4,
+  .react-tree-ranks b,
+  .react-tree-ranks strong {
+    font-size: 11px;
+  }
+
+  .react-tree-primary strong {
+    font-size: 28px;
+  }
+}

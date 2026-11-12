@@ -1,0 +1,157 @@
+/* Reading hierarchy for the application chrome. Chart marks keep their own scale. */
+body.hybrid-ui {
+  --ui-text: 13px;
+  --ui-caption: 11px;
+  --app-header-h: 60px;
+  --app-filter-h: 60px;
+  --app-rail-w: 96px;
+  --hybrid-inspector-w: 312px;
+  font-weight: 400;
+}
+body.hybrid-ui[data-shell-view] .atlas-main { --controls-w: 280px; }
+body.hybrid-ui .atlas-main .hero h1 { font-weight: 600; }
+body.hybrid-ui :is(button, select, input) { font-weight: 500; }
+body.hybrid-ui .hero :is(.app-header-pill, .app-header-kpi) {
+  min-height: 32px;
+  font-size: var(--ui-caption);
+  font-weight: 400;
+}
+body.hybrid-ui .hero :is(.app-header-pill b, .app-header-kpi b) { font-size: 12px; font-weight: 600; }
+body.hybrid-ui .hero .app-header-kpi span { font-size: var(--ui-caption); }
+body.hybrid-ui .hero :is(.atlas-actions button, .app-help-button) { font-size: 12px; font-weight: 500; min-height: 34px; }
+body.hybrid-ui .global-filterbar .field { height: 44px; }
+body.hybrid-ui .global-filterbar .field label { font-size: 12px; font-weight: 500; }
+body.hybrid-ui .global-filterbar .field :is(select, input) { height: 34px; font-size: var(--ui-text); font-weight: 400; }
+body.hybrid-ui .global-filterbar .seg button { height: 34px; font-size: var(--ui-text); font-weight: 500; }
+body.hybrid-ui :is(.app-filter-reset, .global-filterbar .atlas-search input, .global-filterbar .atlas-search button) { height: 44px; font-size: 12px; }
+body.hybrid-ui .viz-rail .viz-btn {
+  padding: 4px;
+  gap: 8px;
+}
+body.hybrid-ui .viz-rail .viz-btn .rail-label { font-size: 11px; line-height: 1.2; font-weight: 500; }
+body.hybrid-ui .drawer-head :is(span, h2),
+body.hybrid-ui .drawer-section-title {
+  text-transform: none;
+  letter-spacing: normal;
+}
+body.hybrid-ui .drawer-head span { font-size: var(--ui-caption); font-weight: 400; }
+body.hybrid-ui .drawer-head h2 { font-size: 14px; font-weight: 600; line-height: 1.25; }
+body.hybrid-ui .drawer-section-title { font-size: var(--ui-caption); font-weight: 500; line-height: 1.4; }
+body.hybrid-ui .drawer-scroll .field label { font-size: 12px; font-weight: 500; }
+body.hybrid-ui .drawer-scroll :is(select, input:not([type="checkbox"]):not([type="range"])) { min-height: 36px; font-size: var(--ui-text); font-weight: 400; }
+body.hybrid-ui .drawer-scroll :is(button, label) { font-size: 12px; font-weight: 500; line-height: 1.3; }
+body.hybrid-ui .drawer-scroll :is(small, p, .note) { font-size: var(--ui-caption); font-weight: 400; line-height: 1.45; }
+body.hybrid-ui :is(.react-tree-field, .react-tree-range, .react-tree-check) { font-size: 12px; font-weight: 500; }
+body.hybrid-ui :is(.react-rank-mode, .react-rank-field, .react-pyramid-mode, .react-pyramid-field,
+  .react-plot-mode, .react-plot-field, .react-plot-choice, .react-dotogram-field, .react-dotogram-choice) > span {
+  font-size: 12px;
+  font-weight: 500;
+}
+body.hybrid-ui .react-heatmap-field { font-size: 12px; font-weight: 500; }
+body.hybrid-ui :is(.react-tree-levels button span, .react-tree-levels button b) { font-size: 12px; font-weight: 500; }
+body.hybrid-ui :is(.react-rank-mode, .react-pyramid-mode, .react-plot-mode) button :is(b, small) {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+body.hybrid-ui :is(.react-rank-mode, .react-pyramid-mode, .react-plot-mode) button small { font-size: var(--ui-caption); font-weight: 400; line-height: 1.25; }
+body.hybrid-ui :is(.react-rank-mode, .react-pyramid-mode, .react-plot-mode) button { min-height: 64px; }
+body.hybrid-ui :is(.react-tree-range output, .react-tree-range b) { font-size: 12px; font-weight: 500; }
+body.hybrid-ui :is(.react-tree-context, .react-tree-range small, .react-rank-note, .react-pyramid-note,
+  .react-plot-note, .react-dotogram-note, .react-heatmap-note) { font-size: var(--ui-caption); font-weight: 400; line-height: 1.45; }
+body.hybrid-ui .chart-head { flex-wrap: wrap; }
+body.hybrid-ui .chart-head h2 { font-size: 16px; font-weight: 600; line-height: 1.25; }
+body.hybrid-ui .chart-head p { font-size: var(--ui-caption); font-weight: 400; line-height: 1.4; }
+body.hybrid-ui .chart-meta { flex-wrap: wrap; }
+body.hybrid-ui .chart-meta .chip { font-size: var(--ui-caption); font-weight: 400; }
+body.hybrid-ui .hybrid-action-button { font-size: 12px; font-weight: 500; min-height: 34px; }
+body.hybrid-ui :is(.hybrid-inspector__head span, .hybrid-inspector__kicker, .react-tree-kicker,
+  .react-heatmap-kicker, .react-rank-kicker, .react-pyramid-kicker, .react-plot-kicker, .react-dotogram-kicker,
+  .react-map-inspector__copy span, .react-infra-panel-header span) {
+  font-size: var(--ui-caption);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.4;
+}
+body.hybrid-ui :is(.hybrid-inspector__head h3, .react-tree-inspector h3, .react-heatmap-card h3,
+  .react-rank-card h3, .react-pyramid-card h3, .react-plot-card h3, .react-dotogram-card h3) {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+body.hybrid-ui :is(.react-tree-inspector-section h4, .react-heatmap-card h4, .react-rank-card h4,
+  .react-pyramid-card h4, .react-plot-card h4, .react-dotogram-card h4) { font-size: 13px; font-weight: 600; }
+body.hybrid-ui :is(.hybrid-inspector__section p, .react-tree-selection p, .react-heatmap-card p,
+  .react-rank-insight, .react-pyramid-insight, .react-plot-insight, .react-dotogram-insight,
+  .react-tree-legend-copy, .react-heatmap-scale-copy) { font-size: var(--ui-caption); font-weight: 400; line-height: 1.45; }
+body.hybrid-ui :is(.react-tree-metrics, .react-heatmap-metrics, .react-rank-metrics,
+  .react-pyramid-metrics, .react-plot-metrics, .react-dotogram-metrics) span {
+  font-size: var(--ui-caption);
+  font-weight: 400;
+  line-height: 1.35;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+body.hybrid-ui :is(.react-tree-metrics, .react-heatmap-metrics, .react-rank-metrics,
+  .react-pyramid-metrics, .react-plot-metrics, .react-dotogram-metrics) b {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+body.hybrid-ui :is(.react-tree-primary span, .react-heatmap-primary span, .react-rank-primary span,
+  .react-pyramid-primary span, .react-plot-primary span, .react-dotogram-primary span) { font-size: var(--ui-caption); }
+body.hybrid-ui :is(.react-tree-primary, .react-heatmap-primary, .react-rank-primary, .react-pyramid-primary, .react-plot-primary, .react-dotogram-primary) strong { font-weight: 600; }
+body.hybrid-ui :is(.react-rank-change, .react-pyramid-change, .react-plot-change) { font-size: var(--ui-caption); }
+body.hybrid-ui :is(.react-tree-metrics, .react-heatmap-metrics, .react-rank-metrics, .react-pyramid-metrics, .react-plot-metrics, .react-dotogram-metrics) span { color: var(--app-muted); }
+body.hybrid-ui :is(.react-tree-ranks button > span:first-child, .react-heatmap-ranking button > span) { font-size: 11px; font-weight: 500; }
+body.hybrid-ui :is(.react-tree-ranks, .react-heatmap-ranking, .react-rank-top, .react-pyramid-top, .react-plot-top, .react-dotogram-list) :is(b, strong) { font-size: 12px; font-weight: 500; }
+body.hybrid-ui :is(.react-tree-ranks, .react-rank-top, .react-pyramid-top, .react-plot-top, .react-dotogram-list) small { font-size: var(--ui-caption); font-weight: 400; line-height: 1.3; }
+body.hybrid-ui :is(.react-rank-details, .react-pyramid-details, .react-plot-details, .react-dotogram-details) { font-size: var(--ui-caption); line-height: 1.45; }
+body.hybrid-ui :is(.treev2-pathbar, .heatv2-stage-head) :is(small, span) { font-size: var(--ui-caption); font-weight: 400; letter-spacing: normal; text-transform: none; }
+body.hybrid-ui .react-tree-path button { font-size: 12px; font-weight: 500; }
+body.hybrid-ui .react-tree-drill { font-size: 13px; font-weight: 500; min-height: 40px; }
+body.hybrid-ui .react-tree-sparkline small { font-size: var(--ui-caption); line-height: 1.3; }
+body.hybrid-ui :is(.react-tree-metrics, .react-heatmap-metrics, .react-rank-metrics, .react-pyramid-metrics, .react-plot-metrics, .react-dotogram-metrics) b { font-variant-numeric: tabular-nums; }
+body.hybrid-ui .react-tree-path > small { font-size: var(--ui-caption); }
+body.hybrid-ui :is(.plot-analysis__summary, .pyramid-analysis__summary) strong { font-size: 14px; font-weight: 600; }
+body.hybrid-ui :is(.plot-analysis__summary, .pyramid-analysis__summary) span { font-size: var(--ui-caption); }
+body.hybrid-ui :is(.plot-analysis__stats, .pyramid-analysis__stats) span { font-size: var(--ui-caption); }
+body.hybrid-ui :is(.plot-analysis__stats, .pyramid-analysis__stats) strong { font-size: 13px; font-weight: 600; }
+body.hybrid-ui :is(.plot-analysis__legend, .pyramid-analysis__legend, .plot-analysis__footnote, .pyramid-analysis__footnote) { font-size: var(--ui-caption); font-weight: 400; line-height: 1.4; }
+body.hybrid-ui .mortality-map-column { grid-template-rows: 56px minmax(0, 1fr); }
+body.hybrid-ui :is(.mortality-map-toolbar, .infra-map-toolbar) button { font-size: 12px; font-weight: 500; }
+body.hybrid-ui .mortality-map-toolbar span { font-size: var(--ui-caption); font-weight: 400; letter-spacing: normal; text-transform: none; }
+body.hybrid-ui :is(.react-map-inspector__copy b, .react-infra-panel-header h3) { font-size: 14px; font-weight: 600; }
+body.hybrid-ui .mortality-map-side { font-size: 12px; }
+body.hybrid-ui .mortality-map-side :is(.map-legend b, .rank-item, .rank-item b) { font-size: 12px; font-weight: 500; }
+body.hybrid-ui .mortality-map-side :is(.legend-range, .site-map-legend-note) { font-size: var(--ui-caption); line-height: 1.4; }
+body.hybrid-ui .infra-group-title span { font-size: 13px; font-weight: 600; }
+body.hybrid-ui .infra-group-title small { font-size: var(--ui-caption); }
+body.hybrid-ui .infra-layer-card :is(b, strong) { font-size: 12px; font-weight: 500; }
+body.hybrid-ui .infra-layer-card small { font-size: var(--ui-caption); }
+body.hybrid-ui .infra-quick-actions button { font-size: 12px; font-weight: 500; }
+body.hybrid-ui :is(.react-infra-map-chrome__title b, .infra-access-card b) { font-size: 12px; font-weight: 500; }
+body.hybrid-ui :is(.react-infra-map-chrome__title span, .infra-access-note) { font-size: var(--ui-caption); }
+body.hybrid-ui .drawer-scroll > .note { display: none; }
+body.hybrid-ui .rate-basis-note {
+  margin: 0;
+  padding: 12px;
+  border-left: 3px solid #a86f18;
+  border-radius: 8px;
+  background: #fff8e8;
+  color: #634d26;
+  font-size: var(--ui-caption);
+  line-height: 1.45;
+}
+body.hybrid-ui .rate-basis-note strong { font-weight: 600; }
+@media (max-width: 1440px) {
+  body.hybrid-ui { --hybrid-inspector-w: 286px; }
+  body.hybrid-ui .chart-head .chart-meta { display: none; }
+}

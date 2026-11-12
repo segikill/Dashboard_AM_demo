@@ -1,189 +1,368 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex">
-  <title>Атлас смертности и здоровья · Демоверсия</title>
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="assets/site.css">
-  <link rel="stylesheet" href="assets/app-shell.css">
-  <link rel="stylesheet" href="assets/responsive-interface.css">
-  <link rel="stylesheet" href="assets/map-workspace.css">
-  <link rel="stylesheet" href="assets/vendor/maplibre-gl/5.24.0/maplibre-gl.css">
-  <link rel="stylesheet" href="assets/territory-card.css">
-  <link rel="stylesheet" href="assets/demo.css">
-  <link rel="stylesheet" href="assets/ons.css">
-  <script defer src="assets/territory-card.js"></script>
-  <script defer src="assets/interaction-mode.js"></script>
-  <script defer src="assets/vendor/maplibre-gl/5.24.0/maplibre-gl.js"></script>
-  <script defer src="assets/amur-map-data.js"></script>
-  <script defer src="assets/amur-map-symbols.js"></script>
-  <script defer src="assets/demo-map.js"></script>
-  <script defer src="assets/ons-data.js"></script>
-  <script defer src="assets/ons.js"></script>
-  <script defer src="assets/demo.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Амурская область — интерактивный атлас смертности</title>
+<style>
+html.atlas-starting .atlas-main{visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+html.atlas-starting .site-skip-link{visibility:hidden}
+#atlasStartup{display:none}
+html.atlas-starting #atlasStartup{position:fixed;inset:0;z-index:10001;display:grid;grid-template-rows:60px 1fr;background:#f3f5f6;color:#5d6f7c;font:14px/1.4 "Segoe UI",Arial,sans-serif}
+#atlasStartup header{display:flex;align-items:center;gap:14px;padding:0 16px;background:#102f45;color:#fff;font-size:clamp(18px,2vw,26px);font-weight:600}
+#atlasStartup svg{width:32px;height:28px;flex:none;fill:none;stroke:#c6e4ec;stroke-width:1.2}
+#atlasStartup p{align-self:center;justify-self:center;margin:24px}
+@media(max-width:600px){#atlasStartup header{gap:10px;padding:0 12px;font-size:17px}#atlasStartup svg{width:24px}}
+</style>
+<script>
+(() => {
+  const html = document.documentElement;
+  html.classList.add("atlas-starting");
+  html.dataset.atlasStartup = "loading";
+  let finished = false, scheduled = false, domReady = false, observer;
+  const finish = status => {
+    if (finished) return;
+    finished = true;
+    clearTimeout(deadline);
+    observer?.disconnect();
+    const main = document.querySelector(".atlas-main");
+    if (main) { main.inert = false; main.removeAttribute("aria-busy"); }
+    html.dataset.atlasStartup = status;
+    html.classList.remove("atlas-starting");
+  };
+  // A missing runtime must never leave the document permanently hidden.
+  const deadline = setTimeout(() => finish("fallback"), 12000);
+  const ready = () => {
+    if (!domReady || !document.body.classList.contains("app-interface-v2") || !document.body.classList.contains("hybrid-ui")) return false;
+    const status = selector => document.querySelector(selector)?.dataset.reactStatus === "ready";
+    const navigation = document.querySelector("[data-react-navigation-rail]");
+    if (!status("[data-react-hybrid-root]") || !status("[data-react-global-filters]") || !status("[data-react-header-status]") || !navigation || navigation.hidden || !navigation.querySelector("[data-react-navigation-ready]")) return false;
+    const selectors = {
+      map: "[data-react-map-chrome-ready]",
+      infrastructure: "[data-react-infra-chrome-ready]",
+      treemap: "[data-react-treemap-controls-ready]",
+      heatmap: "[data-react-heatmap-controls-ready]",
+      arrow: "[data-react-rank-controls-ready]",
+      pyramid: "[data-react-pyramid-controls-ready]",
+      plot: "[data-react-plot-controls-ready]",
+      dotogram: "[data-react-dotogram-controls-ready]"
+    };
+    const selector = selectors[document.getElementById("viz")?.dataset.view];
+    return !selector || Boolean(document.querySelector(selector)) || Boolean(document.querySelector("#viz .is-error"));
+  };
+  const check = () => {
+    if (finished) return;
+    const status = document.querySelector("[data-react-hybrid-root]")?.dataset.reactStatus;
+    if (domReady && ["load-error", "error"].includes(status)) { finish("fallback"); return; }
+    if (scheduled || !ready()) return;
+    scheduled = true;
+    // Separate React roots commit their controls independently. Reveal only
+    // after their effects and the shared workspace layout have settled.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      scheduled = false;
+      if (ready()) finish("ready");
+    }));
+  };
+  window.addEventListener("atlas:react-ready", check);
+  window.addEventListener("atlas:react-load-error", () => { if (domReady) finish("fallback"); });
+  document.addEventListener("DOMContentLoaded", () => {
+    domReady = true;
+    const main = document.querySelector(".atlas-main");
+    if (main && !finished) { main.inert = true; main.setAttribute("aria-busy", "true"); }
+    if (!finished) {
+      observer = new MutationObserver(check);
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "hidden", "data-react-status"] });
+      check();
+    }
+  }, { once: true });
+})();
+</script>
+<link rel="modulepreload" href="assets/react/atlas-hybrid.js?v=8d9dcf7bf2eb">
+<link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
+<style>
+:root{--ink:#172033;--muted:#667085;--line:#dfe5ef;--surface:#f2f5fa;--panel:#fff;--blue:#356ae6;--navy:#183b77;--red:#e35d45;--green:#43a96b;--gold:#d79a12}
+*{box-sizing:border-box}body{margin:0;background:var(--surface);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;line-height:1.42}button,select,input{font:inherit}a{color:var(--blue)}
+.topbar{position:sticky;top:0;z-index:40;display:flex;gap:9px;align-items:center;padding:9px 17px;background:#142441;box-shadow:0 4px 18px #14244133}.topbar a{padding:7px 11px;border:1px solid #ffffff2e;border-radius:999px;color:#fff;text-decoration:none;font-size:12px;font-weight:800}
+main{width:min(1660px,calc(100% - 24px));margin:auto;padding:18px 0 50px}.hero{padding:28px 32px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#17366f,#356ae6 65%,#52a0e8);box-shadow:0 18px 44px #1d40822a}.eyebrow{font-size:11px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;opacity:.8}.hero h1{margin:7px 0 10px;font-size:clamp(28px,3.5vw,45px);line-height:1.05}.hero p{max-width:1130px;margin:0;color:#edf3ff}.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}.tags span{padding:5px 9px;border:1px solid #ffffff32;border-radius:999px;background:#ffffff16;font-size:11px}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:13px 0}.kpi{padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:#fff}.kpi b{display:block;color:#23437b;font-size:21px}.kpi span{color:var(--muted);font-size:11px}
+.workspace{display:grid;grid-template-columns:285px minmax(0,1fr);gap:13px;align-items:start}.sidebar{position:sticky;top:65px;max-height:calc(100vh - 78px);overflow:auto;padding:14px;border:1px solid var(--line);border-radius:17px;background:#fff;box-shadow:0 10px 30px #1e2f5210}.sidebar h2{margin:0 0 9px;font-size:16px}.viz-nav{display:grid;gap:5px;margin-bottom:15px}.viz-btn{display:grid;grid-template-columns:31px 1fr;gap:8px;align-items:center;padding:8px;border:1px solid #e0e6f0;border-radius:10px;background:#f8fafc;color:#3e4a60;text-align:left;cursor:pointer}.viz-btn .icon{display:grid;width:29px;height:29px;place-items:center;border-radius:8px;background:#eaf0fb;color:#315eb7;font-weight:900}.viz-btn span:last-child{font-size:12px;font-weight:800}.viz-btn.active{border-color:#356ae6;background:#edf3ff;color:#214ea8}.viz-btn.active .icon{background:#356ae6;color:#fff}
+.filters{padding-top:12px;border-top:1px solid var(--line)}.field{margin:10px 0}.field label{display:block;margin-bottom:4px;color:#47536a;font-size:11px;font-weight:900}.field select,.field input{width:100%;padding:8px 9px;border:1px solid #cfd7e5;border-radius:8px;background:#fff;color:var(--ink)}.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.seg button{padding:7px 3px;border:1px solid #d6deeb;border-radius:8px;background:#f7f9fc;color:#526078;cursor:pointer;font-size:11px}.seg button.active{border-color:#2d65df;background:#eaf1ff;color:#244fba;font-weight:900}.local-controls{margin-top:13px;padding-top:10px;border-top:1px dashed #d8dfeb}.note{margin-top:12px;padding:10px;border-left:4px solid var(--gold);border-radius:8px;background:#fff8e6;color:#66521f;font-size:10.5px}
+.content{min-width:0}.card{padding:16px;border:1px solid var(--line);border-radius:17px;background:#fff;box-shadow:0 10px 30px #1e2f5210}.chart-head{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}.chart-head h2{margin:0;font-size:23px}.chart-head p{margin:4px 0 0;color:var(--muted);font-size:12px}.chart-meta{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.chip{padding:5px 8px;border-radius:999px;background:#edf2ff;color:#3159b4;font-size:10.5px;font-weight:800}.viz{position:relative;min-height:640px;overflow:auto;border:1px solid #dce3ee;border-radius:13px;background:#fbfcfe}.empty{display:grid;min-height:600px;place-items:center;padding:30px;color:var(--muted);text-align:center}.tooltip{position:fixed;z-index:100;display:none;width:min(340px,calc(100vw - 20px));padding:11px 12px;border:1px solid #ced7e7;border-radius:10px;background:#fffffff8;box-shadow:0 15px 38px #101e3833;pointer-events:none;font-size:11.5px}.tooltip b{display:block;margin-bottom:5px;font-size:13px}.tip-grid{display:grid;grid-template-columns:1fr auto;gap:3px 12px}.tip-grid span:nth-child(odd){color:var(--muted)}
+.treemap{position:relative;width:100%;height:640px}.tile{position:absolute;overflow:hidden;padding:0;border:2px solid #fff;color:#fff;cursor:pointer;text-align:left}.tile:hover,.tile:focus-visible{z-index:5;filter:brightness(1.08);outline:3px solid #ffd85a;outline-offset:-3px}.tile-inner{display:flex;height:100%;flex-direction:column;justify-content:space-between;padding:7px;text-shadow:0 1px 2px #0008}.tile-code{font-weight:900}.tile-label{display:-webkit-box;overflow:hidden;font-weight:700;line-height:1.12;-webkit-box-orient:vertical;-webkit-line-clamp:3}.tile-value{font-size:10px;font-weight:800}.tile.tiny .tile-label,.tile.tiny .tile-value{display:none}.tile.small .tile-label{font-size:9px;-webkit-line-clamp:1}.breadcrumbs{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}.breadcrumbs button{padding:5px 8px;border:0;border-radius:999px;background:#eaf1ff;color:#2856b7;cursor:pointer;font-size:11px;font-weight:900}.breadcrumbs button.current{background:#183b77;color:#fff}
+.heat-wrap{min-width:1210px;padding:12px}.heat-grid{display:grid;gap:2px;align-items:stretch}.heat-head,.heat-rowlabel{position:relative;z-index:1;background:#f5f8fc;font-size:9px;font-weight:800}.heat-head{display:flex;align-items:flex-end;justify-content:center;min-height:78px;padding:3px;writing-mode:vertical-rl;transform:rotate(180deg)}.heat-rowlabel{display:flex;align-items:center;padding:5px 7px;font-size:10px}.heat-group-label{grid-column:1/-1;padding:7px 9px 5px;border-bottom:1px solid #cad6e7;background:#eef3f9;color:#244d7b;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.heat-cell{display:grid;min-height:27px;place-items:center;border-radius:3px;font-size:8.5px;cursor:default}.heat-scale{display:flex;gap:7px;align-items:center;margin:8px 12px;color:var(--muted);font-size:10px}.gradient{width:180px;height:9px;border-radius:99px;background:linear-gradient(90deg,#f0f4fa,#3f7ed7)}
+.svg-chart{display:block;min-width:900px;width:100%;height:auto}.axis{stroke:#aeb9ca;stroke-width:1}.gridline{stroke:#e5eaf2;stroke-width:1}.axis-label{fill:#68758a;font-size:11px}.row-label{fill:#344054;font-size:11px}.chart-note{padding:9px 12px;color:var(--muted);font-size:11px}.map-layout{display:grid;grid-template-columns:minmax(680px,1fr) 300px;min-width:1030px}.map-side{padding:14px;border-left:1px solid var(--line);background:#fff}.map-side h3{margin:0 0 9px}.map-legend{margin:0 0 13px;padding:10px;border:1px solid #dfe7ef;border-radius:10px;background:#f7fafb}.map-legend b{display:block;margin-bottom:5px;font-size:11px}.legend-ramp{height:10px;border-radius:99px;background:linear-gradient(90deg,#e5f1f3,#115b70)}.legend-range{display:flex;justify-content:space-between;margin-top:3px;color:#667085;font-size:9.5px}.size-legend{display:flex;gap:8px;align-items:flex-end;margin-top:8px;color:#667085;font-size:9.5px}.size-dot{display:inline-block;border:2px solid #fff;border-radius:50%;background:#2f6da5;box-shadow:0 0 0 1px #9eb0c4}.input-row{display:grid;grid-template-columns:1fr auto;gap:5px}.input-row button{padding:7px 9px;border:1px solid #ccd7e6;border-radius:8px;background:#edf3f8;color:#31506f;cursor:pointer;font-size:10px;font-weight:800}.rank-list{display:grid;gap:5px}.rank-item{display:grid;grid-template-columns:1fr auto;gap:8px;padding:7px 8px;border:1px solid #e5e9f1;border-radius:8px;font-size:10.5px}.rank-item b{color:#244d9c}.method{margin-top:13px;padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff}.method h3{margin:0 0 7px}.method p,.method li{color:#526077;font-size:12px}.downloads{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.downloads a{padding:7px 10px;border-radius:8px;background:#edf2ff;text-decoration:none;font-size:11px;font-weight:800}footer{padding:22px;color:var(--muted);font-size:11px;text-align:center}
+@media(max-width:1050px){.workspace{grid-template-columns:1fr}.sidebar{position:relative;top:auto;max-height:none}.viz-nav{grid-template-columns:repeat(4,1fr)}.viz-btn{grid-template-columns:1fr;justify-items:center;text-align:center}.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.local-controls{grid-column:1/-1}.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){main{width:calc(100% - 12px);padding-top:8px}.hero{padding:22px 18px}.kpis{grid-template-columns:repeat(2,1fr)}.viz-nav{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr}.card{padding:10px}.chart-head h2{font-size:19px}.viz{min-height:570px}.treemap{height:570px}.tile-inner{padding:4px}.map-layout{grid-template-columns:680px 280px}}
+</style>
+<link rel="stylesheet" href="assets/site.css?v=1620a2fbc67a">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/infrastructure-map.css?v=b845092a5054">
+<link rel="stylesheet" href="assets/mortality-map.css?v=61d635fe7f10">
+<link rel="stylesheet" href="assets/app-shell.css?v=4e3b3185cb13">
+<link rel="stylesheet" href="assets/treemap-v2.css?v=4e14ad315205">
+<link rel="stylesheet" href="assets/heatmap-v2.css?v=4bfd906e9e5a">
+<link rel="stylesheet" href="assets/rank-analysis.css?v=aec3d2df598b">
+<link rel="stylesheet" href="assets/rank-react.css?v=11a76ef6376c">
+<link rel="stylesheet" href="assets/pyramid-analysis.css?v=8fd8c27b6565">
+<link rel="stylesheet" href="assets/pyramid-react.css?v=b54dea550607">
+<link rel="stylesheet" href="assets/dotogram-react.css?v=1ce1caf8fcf5">
+<link rel="stylesheet" href="assets/hybrid-interface.css?v=51548b7e7444">
+<link rel="stylesheet" href="assets/readable-interface.css?v=a4bf187aad1f">
+<link rel="stylesheet" href="assets/municipal-context.css?v=05354a26cd5d">
+<link rel="stylesheet" href="assets/medical-resources.css?v=b06fa8c2fb01">
+<link rel="stylesheet" href="assets/responsive-interface.css?v=2a0d2a974202">
+<link rel="stylesheet" href="assets/territory-card.css?v=224edca28e66">
+<link rel="stylesheet" href="assets/map-workspace.css?v=e4c2ef8d53ba">
+<script defer src="assets/interaction-mode.js?v=9f71d5ef5593"></script>
+<script defer src="assets/basemap.js?v=5810682f277d"></script>
+<script defer src="assets/territory-card.js?v=24d40716af37"></script>
+<script defer src="assets/infrastructure-map.js?v=3f7ed5ae2e4c"></script>
+<script defer src="assets/mortality-map.js?v=c89c96c34379"></script>
+<script defer src="assets/rank-analysis.js?v=809638d17563"></script>
+<script defer src="assets/pyramid-analysis.js?v=7456ba8e36fb"></script>
+<script defer src="assets/site.js?v=514653b39a60"></script>
+<script defer src="assets/dotogram-analysis.js?v=b1343f868a2f"></script>
+<script defer src="assets/treemap-v2.js?v=084d397975a0"></script>
+<script defer src="assets/heatmap-v2.js?v=4bf0c67aa03b"></script>
+<script defer src="assets/app-shell.js?v=fc770f329198"></script>
+<script defer src="assets/hybrid-interface.js?v=49d1353bca21"></script>
+<script defer src="assets/react-legacy-bridge.js?v=d1a13f17fe73"></script>
+<script defer src="assets/responsive-interface.js?v=55b5396e2754"></script>
+<script defer src="assets/map-workspace.js?v=b4ead9c6922a"></script>
 </head>
-<body class="site-observatory app-interface-v2 hybrid-ui map-workspace-desktop atlas-demo" data-region="amur" data-shell-view="map">
+<body>
+<div id="atlasStartup" role="status" aria-live="polite" hidden><header><svg viewBox="0 0 40 30" aria-hidden="true"><path d="M1 15h6l2.4-7 4.2 15 4.2-21 4.3 26 3.2-13H39"/></svg><span>Смертность Амурской области</span></header><p>Загрузка портала…</p></div>
 <main class="atlas-main">
-  <header class="hero">
-    <span class="app-brand-mark" aria-hidden="true"><svg viewBox="0 0 40 30"><path d="M1 15h6l2.4-7 4.2 15 4.2-21 4.3 26 3.2-13H39"/><circle cx="20" cy="15" r="2.4"/></svg></span>
-    <h1>Атлас смертности и здоровья</h1>
-    <div class="app-header-context"><span class="app-header-pill">Демоверсия</span></div>
-  </header>
-  <div class="workspace" id="atlasWorkspace">
-    <aside class="viz-rail" aria-label="Типы визуализации">
-      <div class="react-navigation-rail">
-        <button class="rail-drawer-toggle" id="drawerRailToggle" type="button" data-panel="atlasDrawer" aria-controls="atlasDrawer" aria-label="Панель параметров"><span aria-hidden="true">«</span><small>Панель</small></button>
-        <nav class="viz-nav" id="vizNav" aria-label="Разделы по территории">
-          <div class="demo-nav-group" data-geography="amur" role="group" aria-labelledby="amurNavTitle">
-            <p class="demo-nav-group__title" id="amurNavTitle">Амурская область</p>
-            <div class="demo-nav-group__tabs">
-<button type="button" class="viz-btn viz-btn--map-primary active" data-order="1" data-view="map" title="Интерактивная карта смертности" aria-label="Интерактивная карта смертности"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/><circle class="fill" cx="12" cy="11" r="2"/></svg></span><span class="rail-label">Смертность</span></button>
-<button type="button" class="viz-btn viz-btn--map-primary" data-order="2" data-view="infrastructure" title="Интерактивная карта инфраструктуры медицинских объектов" aria-label="Интерактивная карта инфраструктуры медицинских объектов"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h10v16H5zM8 2h4v6H8zM15 9h4v12h-4zM8 12h4M10 10v4M7 18h6"/><circle class="fill" cx="18" cy="6" r="3"/></svg></span><span class="rail-label">Мед<wbr>объекты</span></button>
-            </div>
-          </div>
-          <div class="demo-nav-group" data-geography="ons" role="group" aria-labelledby="onsNavTitle">
-            <p class="demo-nav-group__title" id="onsNavTitle">Англия и Уэльс</p>
-            <div class="demo-nav-group__tabs">
-<button type="button" class="viz-btn" data-order="3" data-view="treemap" title="Структура причин смерти" aria-label="Структура причин смерти"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="10" height="8"/><rect x="14" y="3" width="7" height="14"/><rect x="3" y="12" width="10" height="9"/><rect x="14" y="18" width="7" height="3"/></svg></span><span class="rail-label">Структура</span></button>
-<button type="button" class="viz-btn" data-order="4" data-view="heatmap" title="Матрица «территория × причина»" aria-label="Матрица «территория × причина»"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/><rect class="fill" x="10" y="10" width="4" height="4"/></svg></span><span class="rail-label">Матрица</span></button>
-<button type="button" class="viz-btn" data-order="5" data-view="arrow" title="Ранги причин смерти" aria-label="Ранги причин смерти"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h13M14 4l3 3-3 3M20 17H7M10 14l-3 3 3 3"/></svg></span><span class="rail-label">Ранги</span></button>
-<button type="button" class="viz-btn" data-order="6" data-view="pyramid" title="Возрастно-половая пирамида" aria-label="Возрастно-половая пирамида"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4 4 20h7zM13 4l7 16h-7zM4 20h16"/></svg></span><span class="rail-label">Пирамида</span></button>
-<button type="button" class="viz-btn" data-order="7" data-view="plot" title="Медианный возраст и интервалы" aria-label="Медианный возраст и интервалы"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18M3 17h18M6 4v6M18 4v6M8 14v6M16 14v6"/><circle class="fill" cx="12" cy="7" r="2"/><circle class="fill" cx="12" cy="17" r="2"/></svg></span><span class="rail-label">Возраст</span></button>
-<button type="button" class="viz-btn" data-order="8" data-view="dotogram" title="Сравнение территорий" aria-label="Сравнение территорий"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="fill" cx="6" cy="6" r="2"/><circle class="fill" cx="12" cy="5" r="2"/><circle class="fill" cx="18" cy="7" r="2"/><circle class="fill" cx="7" cy="13" r="2"/><circle class="fill" cx="14" cy="12" r="2"/><circle class="fill" cx="18" cy="17" r="2"/><circle class="fill" cx="9" cy="19" r="2"/></svg></span><span class="rail-label">Сравнение</span></button>
-            </div>
-          </div>
-        </nav>
-      </div>
-    </aside>
-    <aside class="sidebar" id="atlasDrawer" aria-label="Параметры выбранной визуализации">
-      <div class="drawer-inner">
-        <header class="drawer-head">
-          <div><span>Параметры</span><h2 id="drawerTitle">Интерактивная карта смертности</h2></div>
-          <div class="drawer-head-actions"><button type="button" data-panel="atlasDrawer" aria-controls="atlasDrawer" aria-label="Свернуть параметры">«</button></div>
-        </header>
-        <div class="drawer-scroll">
-          <div id="localControls" class="local-controls">
-            <div class="field">
-              <label id="yearLabel">Период</label>
-              <div id="years" class="mortality-switch mortality-switch--period" role="group" aria-labelledby="yearLabel"></div>
-            </div>
-            <div class="field">
-              <label for="indicator">Показатель</label>
-              <select id="indicator"></select>
-            </div>
-            <div class="field">
-              <label for="territory">Территория</label>
-              <select id="territory"></select>
-            </div>
-            <fieldset class="demo-layers">
-              <legend>Слои карты</legend>
-              <label><input id="showSettlements" type="checkbox"> Населённые пункты</label>
-            </fieldset>
-            <div class="field">
-              <label for="mapLabels">Подписи населённых пунктов</label>
-              <select id="mapLabels">
-                <option value="auto">Авто по масштабу</option>
-                <option value="centers">Только города</option>
-                <option value="off">Без подписей</option>
-              </select>
-            </div>
-          </div>
-          <div class="ons-filters" id="onsFilters" aria-label="Фильтры данных ONS" hidden></div>
-        </div>
-      </div>
-    </aside>
-    <section class="content" aria-labelledby="chartTitle">
-      <div class="card demo-card">
-        <header class="chart-head ons-heading" id="analysisHeading" hidden>
-          <div class="demo-view-heading">
-            <div class="demo-geography" data-geography="ons"><strong>Англия и Уэльс</strong><span>Демонстрационный пример ONS · 2023–2025</span></div>
-            <h2 id="chartTitle"></h2>
-          </div>
-          <div class="ons-heading-actions">
-            <a href="https://www.nomisweb.co.uk/datasets/mortsa">Источник ONS / Nomis</a>
-            <button type="button" data-panel="atlasDrawer" aria-controls="atlasDrawer">Фильтры</button>
-            <button type="button" id="onsOpenDetails" aria-controls="onsDetailsDialog">Сведения</button>
-          </div>
-        </header>
-        <div id="onsStage" class="ons-stage" hidden>
-          <div class="ons-workspace">
-            <div class="ons-main">
-              <p id="onsContext" class="ons-context"></p>
-              <div id="onsChart" class="ons-chart"></div>
-              <footer class="ons-attribution">Office for National Statistics © Crown copyright · <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a></footer>
-            </div>
-            <aside id="onsInspector" class="ons-inspector" aria-label="Аналитический контекст" aria-live="polite"></aside>
-          </div>
-          <dialog id="onsDetailsDialog" aria-labelledby="onsDetailsTitle">
-            <header><h3 id="onsDetailsTitle">Сведения · Англия и Уэльс</h3><form method="dialog"><button type="submit" aria-label="Закрыть сведения" autofocus>×</button></form></header>
-            <div id="onsDetailsBody"></div>
-          </dialog>
-        </div>
-        <div class="demo-map-stage" id="mapStage">
-          <header class="map-workspace-toolbar mortality-map-toolbar">
-            <div class="map-workspace-toolbar__heading">
-              <button class="demo-settings-button" type="button" data-panel="atlasDrawer" aria-controls="atlasDrawer">Настройки</button>
-              <div class="map-workspace-title demo-view-heading">
-                <div class="demo-geography" data-geography="amur"><strong>Амурская область</strong><span>Показатели регионального сборника</span></div>
-                <b id="mapTitle">Общая смертность</b><span id="mapUnit"></span>
-              </div>
-            </div>
-            <div class="map-workspace-toolbar__actions">
-              <form class="map-workspace-search" id="mapSearch" role="search" aria-label="Поиск по текущей карте">
-                <input id="mapSearchInput" type="search" aria-label="Найти территорию на текущей карте" placeholder="Найти территорию" autocomplete="off">
-                <button type="submit">Найти</button>
-                <span class="map-workspace-search__message" id="mapSearchMessage" role="status"></span>
-              </form>
-              <button type="button" id="resetMap">Вся область</button>
-              <button type="button" class="demo-mobile-statistics" data-panel="mapInformation" aria-controls="mapInformation">
-                <span class="demo-mobile-statistics__label">Статистика</span><strong id="mapMobileValue"></strong>
-              </button>
-            </div>
-          </header>
-          <div class="demo-map-body">
-            <div class="demo-map-frame">
-              <div id="mortalityMap" class="demo-map-canvas"></div>
-              <div id="medicalMap" class="demo-map-canvas" hidden></div>
-              <p id="mapError" class="demo-map-error" role="status" hidden></p>
-              <button class="map-workspace-legend" id="mapLegend" type="button" data-panel="mapInformation" aria-controls="mapInformation"><b>Легенда</b><small id="legendUnit"></small></button>
-            </div>
-            <aside class="map-workspace-information demo-information" id="mapInformation" aria-label="Сведения о территории">
-              <header><h3 id="mapInformationTitle" tabindex="-1">Статистика по территории</h3><button type="button" class="demo-mobile-statistics" data-panel="mapInformation" aria-controls="mapInformation" aria-label="Закрыть сведения">×</button></header>
-              <div class="map-workspace-information__scroll">
-                <section id="territoryDetails" aria-live="polite" tabindex="-1"></section>
-                <section id="annualSeries">
-                  <h4>По годам</h4>
-                  <dl id="series" class="demo-series"></dl>
-                </section>
-                <section id="legendDetails">
-                  <h4>Легенда карты</h4>
-                  <ul id="legend" class="demo-legend-list"></ul>
-                  <p class="demo-source" id="metricSource"></p>
-                  <p class="demo-source" id="metricNote" hidden></p>
-                  <div class="demo-population-legend" id="populationLegend" hidden>
-                    <h4>Население на 1 октября 2021 года</h4>
-                    <ul id="populationClasses"></ul>
-                  </div>
-                </section>
-                <details id="medicalComparison" hidden>
-                  <summary>Сравнить муниципалитеты</summary>
-                  <ul class="demo-comparison-list" id="comparison"></ul>
-                  <div class="demo-pages">
-                    <button type="button" id="previous">Назад</button>
-                    <span id="pageCount" aria-live="polite"></span>
-                    <button type="button" id="next">Далее</button>
-                  </div>
-                </details>
-              </div>
-            </aside>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-</main>
-<script type="application/json" id="atlas-data">{"territories":[{"id":"t1","name":"Архаринский (р-н)"},{"id":"t2","name":"Белогорск (г.)"},{"id":"t3","name":"Белогорский (р-н)"},{"id":"t4","name":"Благовещенск (г.)"},{"id":"t5","name":"Благовещенский (р-н)"},{"id":"t6","name":"Бурейский (р-н)"},{"id":"t7","name":"Завитинский (р-н)"},{"id":"t8","name":"Зейский (р-н)"},{"id":"t9","name":"Зея (г.)"},{"id":"t10","name":"Ивановский (р-н)"},{"id":"t11","name":"Константиновский (р-н)"},{"id":"t12","name":"Магдагачинский (р-н)"},{"id":"t13","name":"Мазановский (р-н)"},{"id":"t14","name":"Михайловский (р-н)"},{"id":"t15","name":"Октябрьский (р-н)"},{"id":"t16","name":"Циолковский (г.)"},{"id":"t17","name":"Прогресс (пгт)"},{"id":"t18","name":"Райчихинск (г.)"},{"id":"t19","name":"Ромненский (р-н)"},{"id":"t20","name":"Свободненский (р-н)"},{"id":"t21","name":"Свободный (г.)"},{"id":"t22","name":"Селемджинский (р-н)"},{"id":"t23","name":"Серышевский (р-н)"},{"id":"t24","name":"Сковородинский (р-н)"},{"id":"t25","name":"Тамбовский (р-н)"},{"id":"t26","name":"Тында (г.)"},{"id":"t27","name":"Тындинский (р-н)"},{"id":"t28","name":"Шимановск (г.)"},{"id":"t29","name":"Шимановский (р-н)"}],"indicators":[{"id":"deaths_rate","label":"Общая смертность","unit":"на 1000 населения","page":135,"years":[2023,2024,2025],"breaks":[10,15,20,25],"values":{"t1":[20.7,20.1,22.4],"t2":[13.7,14.1,16.8],"t3":[13.9,14,15.4],"t4":[10.2,10.1,11.2],"t5":[8.8,9.5,9],"t6":[20.9,21.1,23.5],"t7":[19.3,19.7,21.8],"t8":[18.7,21.4,22.5],"t9":[19.3,18.4,18.9],"t10":[16.2,15.5,19.3],"t11":[16.2,14.3,17.4],"t12":[20.1,19,20.8],"t13":[22.3,17.8,21.1],"t14":[15.5,16.4,20.7],"t15":[13,11.2,18.6],"t16":[6.2,6,7],"t17":[21.3,18.8,22.1],"t18":[19.6,21,22.9],"t19":[17.7,18.3,22.5],"t20":[16.7,17.4,14.3],"t21":[16.2,15.7,17],"t22":[14.4,17.5,16.9],"t23":[14.9,12.9,15.3],"t24":[18.6,17.7,19.7],"t25":[15.6,15.7,17.9],"t26":[13.9,12.7,13.6],"t27":[12.3,14.4,13.4],"t28":[17.7,17.3,19.7],"t29":[18,20.7,16.3],"region":[14,14.1,16.1]}},{"id":"doctors_rate","label":"Обеспеченность врачами системы Минздрава РФ","unit":"на 10 тыс. населения","page":99,"years":[2023,2024,2025],"breaks":[10,20,30,40],"values":{"t1":[21,21.1,20.3],"t2":[19.8,19.9,19.1],"t3":[7.6,7.1,6.5],"t4":[37.3,38.3,36.7],"t5":[11.7,12.1,14.6],"t6":[22.3,19.7,19.7],"t7":[25,24.7,26.5],"t8":[7.1,7.3,6.4],"t9":[49.3,49.8,43.8],"t10":[31.3,31.8,30.9],"t11":[18.8,22.1,19.2],"t12":[15.8,15.4,13],"t13":[25.1,22.1,18.8],"t14":[21.2,20.8,19.9],"t15":[16.3,16,15.5],"t16":[null,null,null],"t17":[23,20.4,20.4],"t18":[34.2,29.3,28.2],"t19":[20.8,22.5,22.5],"t20":[8,4.8,5.4],"t21":[32.9,32.9,34.3],"t22":[16.9,14,15.4],"t23":[21.6,22.2,19.8],"t24":[16.7,16,14],"t25":[22.6,24.3,24.8],"t26":[34.5,36.6,30.8],"t27":[8.2,8.3,8.3],"t28":[23.7,25.1,22],"t29":[2,2.1,0],"region":[41.6,41.6,40.6]}},{"id":"beds_24h_rate","label":"Обеспеченность круглосуточными койками","unit":"на 10 тыс. населения","page":122,"years":[2024,2025],"breaks":[20,40,60,80],"values":{"t1":[null,40.4,40.6],"t2":[null,26.4,25.2],"t3":[null,8.8,8.9],"t4":[null,30.8,28.9],"t5":[null,null,null],"t6":[null,39.2,40],"t7":[null,45.7,46.8],"t8":[null,20.4,20],"t9":[null,84.1,70.9],"t10":[null,49.6,46.8],"t11":[null,30.9,31.7],"t12":[null,35.2,35.8],"t13":[null,30.5,24.4],"t14":[null,31.8,25.7],"t15":[null,32.1,32.6],"t16":[null,null,null],"t17":[null,30.4,32.5],"t18":[null,75.5,76.3],"t19":[null,36.1,36.6],"t20":[null,30.9,21.8],"t21":[null,43.6,42.3],"t22":[null,28.1,21.1],"t23":[null,27.3,24.1],"t24":[null,36.4,37.2],"t25":[null,30.4,30.7],"t26":[null,57.6,53.9],"t27":[null,11,10.5],"t28":[null,33.1,33.3],"t29":[null,null,null],"region":[null,76.9,73.1]}},{"id":"fap_count","label":"Количество ФАП","unit":"объектов","page":95,"years":[2024,2025],"breaks":[0,5,10,20],"values":{"t1":[null,15,15],"t2":[null,1,1],"t3":[null,16,16],"t4":[null,0,0],"t5":[null,17,17],"t6":[null,8,8],"t7":[null,14,13],"t8":[null,17,17],"t9":[null,0,0],"t10":[null,18,18],"t11":[null,13,13],"t12":[null,7,7],"t13":[null,9,10],"t14":[null,13,13],"t15":[null,18,18],"t16":[null,null,null],"t17":[null,0,0],"t18":[null,0,0],"t19":[null,15,15],"t20":[null,24,24],"t21":[null,0,0],"t22":[null,5,5],"t23":[null,25,25],"t24":[null,7,7],"t25":[null,17,17],"t26":[null,0,0],"t27":[null,14,14],"t28":[null,0,0],"t29":[null,12,12],"region":[null,285,285]}},{"id":"infant_death_rate","label":"Младенческая смертность","years":[2023,2024,2025],"breaks":[0,5,10,20],"values":{"t1":[0,8.3,0],"t3":[0,7.6,0],"t5":[2.5,2.7,6],"t6":[6.4,13.5,6.8],"t7":[0,7.6,13.2],"t8":[0,0,0],"t10":[14.5,0,0],"t11":[0,0,0],"t12":[0,13.8,7.1],"t13":[0,0,9.7],"t14":[0,0,0],"t15":[0,7.6,0],"t19":[0,0,30.3],"t20":[0,0,0],"t22":[0,0,21.3],"t23":[4.2,4.1,4.3],"t24":[4.7,18.6,0],"t25":[0,16.9,9.5],"t27":[12.5,0,13.2],"t29":[0,0,0],"t2":[1.7,9.9,4.3],"t4":[5.9,2.1,3.3],"t9":[10.1,18.5,26.1],"t18":[0,0,13.6],"t21":[3.8,5.1,2.5],"t26":[3.6,3.5,0],"t28":[0,0,0],"t17":[0,11.4,12.2],"region":[3.8,5.2,4.9]},"unit":"на 1000 родившихся живыми","page":141,"note":"Число умерших в возрасте до года на 1 000 родившихся живыми.","view":"map"},{"id":"morbidity_143","label":"Общая заболеваемость по обращаемости","years":[2024,2025],"breaks":[750,1250,1750,2250],"values":{"t1":[null,1828.6,1665.5],"t3":[null,815.6,512.7],"t5":[null,1072.4,1109.6],"t6":[null,1196.4,1172.9],"t7":[null,1453.2,1419.5],"t8":[null,788.7,683.6],"t10":[null,1983.3,1873.8],"t11":[null,1318.3,1404.9],"t12":[null,1279.2,1282.4],"t13":[null,2521.9,2389.9],"t14":[null,2152.3,2171.9],"t15":[null,1810.5,1910.2],"t19":[null,1695.2,1711],"t20":[null,1711,1713.7],"t22":[null,711.6,654.6],"t23":[null,1229.2,1282.4],"t24":[null,1412.8,1397.2],"t25":[null,2147.5,2159.6],"t27":[null,595.9,578.6],"t29":[null,1028.8,1063.5],"t2":[null,1095.4,1119.1],"t4":[null,2080.1,2039.4],"t9":[null,3096.5,2761.9],"t18":[null,2178.4,2142.6],"t21":[null,1845.1,1867.9],"t26":[null,2287.6,2174.1],"t28":[null,1636.9,1638.9],"t17":[null,1774.4,1743.9],"region":[null,1799.6,1877.6]},"unit":"на 1000 всего населения","page":143,"note":"Учитываются все заболевания, зарегистрированные при обращении за медицинской помощью.","view":"map"},{"id":"incidence_143","label":"Первичная заболеваемость по обращаемости","years":[2024,2025],"breaks":[400,700,1000,1300],"values":{"t1":[null,1006.1,875.4],"t3":[null,381.7,284.7],"t5":[null,507.4,517.3],"t6":[null,589.1,574.7],"t7":[null,620,560.8],"t8":[null,455.3,377.9],"t10":[null,984.2,1026.5],"t11":[null,648.4,516.5],"t12":[null,783.8,847.1],"t13":[null,1407,1350.2],"t14":[null,1075.7,1073.9],"t15":[null,1031.9,1073.9],"t19":[null,704,717.4],"t20":[null,813.6,819.9],"t22":[null,287.5,244.1],"t23":[null,653.4,685.2],"t24":[null,800,786.7],"t25":[null,1101.4,1112.4],"t27":[null,370.8,362],"t29":[null,608.9,661.7],"t2":[null,671.6,674.8],"t4":[null,911,883.2],"t9":[null,1561.7,1301.7],"t18":[null,1062.2,1038.5],"t21":[null,780.8,815.5],"t26":[null,1498.7,1471.5],"t28":[null,1020.6,934.3],"t17":[null,979.6,916.3],"region":[null,879.7,974.3]},"unit":"на 1000 всего населения","page":143,"note":"Учитываются заболевания, впервые зарегистрированные при обращении за медицинской помощью.","view":"map"}]}</script>
-</body>
-</html>
+<header class="hero"><div class="eyebrow">Демоверсия</div><h1>Амурская область: смертность и медицинская инфраструктура</h1><p>Опубликованные показатели из статистического сборника Амурской области.</p></header>
+<section class="kpis"><div class="kpi"><b id="kpiN">—</b><span>смертей в фильтре</span></div><div class="kpi"><b id="kpiAge">—</b><span>медианный возраст</span></div><div class="kpi"><b id="kpiPgpzh">—</b><span>ПГПЖ-75</span></div><div class="kpi"><b id="kpiGeo">—</b><span>с координатами НП</span></div><div class="kpi"><b id="kpiLead">—</b><span>ведущий класс</span></div></section>
+<section class="global-filterbar" aria-label="Общие фильтры атласа">
+<div id="reactGlobalFilters" class="react-global-filter-host" data-react-global-filters hidden></div>
+<div class="filters" data-legacy-global-filters><div class="field"><label for="yearSelect">Период</label><select id="yearSelect" disabled><option value="all">2023–2025</option></select></div><div class="field"><label>Пол</label><div class="seg" id="sexSeg"><button disabled class="active" data-value="all">Все</button><button disabled data-value="1">М</button><button disabled data-value="2">Ж</button></div></div><div class="field"><label for="ageSelect">Возраст</label><select id="ageSelect" disabled><option value="all">Все возрасты</option><option value="0_14">0–14</option><option value="15_44">15–44</option><option value="45_64">45–64</option><option value="65_79">65–79</option><option value="80P">80+</option></select></div></div>
+</section>
+<div class="workspace" id="atlasWorkspace">
+<aside class="viz-rail" aria-label="Типы визуализации">
+<div class="react-navigation-rail-host" data-react-navigation-rail hidden></div>
+<div class="legacy-navigation-rail" data-legacy-navigation-rail>
+<button class="rail-drawer-toggle" id="drawerRailToggle" type="button" aria-controls="atlasDrawer" aria-expanded="true" title="Свернуть или открыть панель параметров"><span aria-hidden="true">«</span><small>Панель</small></button>
+<nav class="viz-nav" id="vizNav">
+<button class="viz-btn viz-btn--map-primary active" data-order="1" data-view="map" title="Интерактивная карта смертности" aria-label="Интерактивная карта смертности"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/><circle class="fill" cx="12" cy="11" r="2"/></svg></span><span class="rail-label">Смертность</span></button>
+<button class="viz-btn viz-btn--map-primary" data-order="2" data-view="infrastructure" title="Интерактивная карта инфраструктуры медицинских объектов" aria-label="Интерактивная карта инфраструктуры медицинских объектов"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h10v16H5zM8 2h4v6H8zM15 9h4v12h-4zM8 12h4M10 10v4M7 18h6"/><circle class="fill" cx="18" cy="6" r="3"/></svg></span><span class="rail-label">Мед<wbr>объекты</span></button>
+<button class="viz-btn viz-btn--analysis-start" data-order="3" data-view="treemap" title="Структура причин смерти · МКБ-10" aria-label="Структура причин смерти · МКБ-10"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="10" height="8"/><rect x="14" y="3" width="7" height="14"/><rect x="3" y="12" width="10" height="9"/><rect x="14" y="18" width="7" height="3"/></svg></span><span class="rail-label">Структура</span></button>
+<button class="viz-btn" data-order="4" data-view="heatmap" title="Матрица «территория × причина»" aria-label="Матрица «территория × причина»"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/><rect class="fill" x="10" y="10" width="4" height="4"/></svg></span><span class="rail-label">Матрица</span></button>
+<button class="viz-btn" data-order="5" data-view="arrow" title="Ранги причин смерти" aria-label="Ранги причин смерти"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h13M14 4l3 3-3 3M20 17H7M10 14l-3 3 3 3"/></svg></span><span class="rail-label">Ранги</span></button>
+<button class="viz-btn" data-order="6" data-view="pyramid" title="Возрастно-половая пирамида" aria-label="Возрастно-половая пирамида"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4 4 20h7zM13 4l7 16h-7zM4 20h16"/></svg></span><span class="rail-label">Пирамида</span></button>
+<button class="viz-btn" data-order="8" data-view="dotogram" title="Сравнение территорий" aria-label="Сравнение территорий"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="fill" cx="6" cy="6" r="2"/><circle class="fill" cx="12" cy="5" r="2"/><circle class="fill" cx="18" cy="7" r="2"/><circle class="fill" cx="7" cy="13" r="2"/><circle class="fill" cx="14" cy="12" r="2"/><circle class="fill" cx="18" cy="17" r="2"/><circle class="fill" cx="9" cy="19" r="2"/></svg></span><span class="rail-label">Сравнение</span></button>
+</nav>
+</div>
+</aside>
+<aside class="sidebar" id="atlasDrawer" aria-label="Параметры выбранной визуализации"><div class="drawer-inner">
+<header class="drawer-head"><div><span>Параметры</span><h2 id="drawerTitle">Интерактивная карта смертности</h2></div><div class="drawer-head-actions"><button id="atlasHelpToggle" type="button" title="Методика и пояснения" aria-label="Открыть методику">?</button><button id="drawerToggle" type="button" aria-controls="atlasDrawer" aria-expanded="true" title="Свернуть панель" aria-label="Свернуть панель">«</button></div></header>
+<div class="drawer-scroll"><div class="drawer-section-title">Настройки выбранной визуализации</div><div class="react-treemap-controls-host" data-react-treemap-controls hidden></div><div class="react-heatmap-controls-host" data-react-heatmap-controls hidden></div><div class="react-rank-controls-host" data-react-rank-controls hidden></div><div class="react-pyramid-controls-host" data-react-pyramid-controls hidden></div><div class="react-plot-controls-host" data-react-plot-controls hidden></div><div class="react-dotogram-controls-host" data-react-dotogram-controls hidden></div><div data-resource-comparison-filters></div><div class="local-controls" id="localControls" data-legacy-local-controls></div>
+</div>
+</div></aside>
+<section class="content"><div class="card"><div class="chart-head"><div><h2 id="chartTitle">Интерактивная карта смертности</h2><p id="chartSubtitle"></p></div></div><div class="chart-meta" id="chartMeta"></div><div class="viz" id="viz"></div></div>
+<section class="method"><h3>Как читать атлас</h3><p id="methodText"></p>
+<details class="method-topic"><summary>Данные демоверсии</summary><ul>
+<li>На карте смертности и в сравнении показаны общая и младенческая смертность за 2025 год: «Здоровье и здравоохранение Амурской области», страницы 135 и 141. Коэффициенты приведены в единицах источника.</li>
+<li>На уровне населённых пунктов показана численность по переписи 2021 года. Отсутствие значения в сборнике обозначено пропуском; опубликованный ноль сохраняется.</li>
+<li>Сборник не содержит сопоставимых долей по всем причинам смерти, муниципалитетам и половозрастным группам. Для этих срезов сохранены разделы интерфейса с пропусками.</li>
+</ul></details><details class="method-topic"><summary>Медицинские ресурсы и доступность</summary><ul>
+<li>Медицинские ресурсы показаны по муниципалитетам за выбранный год. Пол, возраст и МКБ смертности их не фильтруют; значения разных лет не суммируются. Изохроны доступны в режиме «Сеть и доступность».</li>
+<li>Обеспеченность педиатрами указана на 10 тыс. детей 0–17 лет, акушерами-гинекологами — на 10 тыс. женщин. Укомплектованность должностей и физическими лицами — разные показатели; совместительство выражено коэффициентом. Опубликованные значения выше 100% сохранены.</li>
+<li>Единая шкала ресурсов за 2023–2025 годы отражает значения, а не норматив качества помощи. «Нет данных» отличается от нуля; охват муниципалитетов указан рядом с показателем. Областные и объединённые строки не распределяются между муниципалитетами.</li>
+<li>Посещения на жителя, на ФАП и на занятую ставку врача имеют разные основания. Занятость койки выражена днями на койку, пребывание — днями, оборот — пациентами на койку. Больничная летальность пациентов не равна смертности жителей МО.</li>
+<li>Диагностика на 1000 населения и на 100 посещений — отдельные показатели. Исследования на 100 посещений не являются процентом обследованных жителей и могут превышать 100. Опубликованные категории посещений не складываются здесь в новый общий итог.</li>
+<li>Охват изохрон оценён по населению НП переписи 2021: при попадании координаты НП учитывается его полная численность; зона 60 минут включает 20-минутную.</li>
+</ul></details></section><footer>Амурская область · демонстрационная версия атласа</footer></section>
+</div></main><div class="tooltip" id="tooltip"></div><div id="reactHybridRoot" data-react-hybrid-root hidden></div>
+<script src="assets/analytics/atlas-analytics-core.js?v=93b4a03eac44"></script>
+<script src="data/atlas-reference.js?v=f72e852ad54e"></script>
+<script src="data/demo-bulletin.js?v=8a10ea5c34b3"></script>
+<script src="data/atlas-data.js?v=b6a36df57653"></script>
+<script>
+const DATA=window.AMUR_ATLAS_DATA;
+if(!DATA){throw new Error('Atlas data failed to load: data/atlas-data.js');}
+const ANALYTICS_CORE=window.AmurAtlasAnalyticsCore;
+if(!ANALYTICS_CORE){throw new Error('Atlas analytics core failed to load: assets/analytics/atlas-analytics-core.js');}
+const NF=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}),DF=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1});
+const DEFAULT_YEAR='2025';
+const state={view:'map',year:DEFAULT_YEAR,sex:'all',age:'all',treeType:'root',treeIndex:-1,treeMetric:'share',treeColor:'change',heatUnit:'mo',heatMetric:'share',heatLimit:'25',arrowMode:'time',pyramidClass:'all',pyramidMetric:'share',plotLevel:'class',plotClass:'all',mapUnit:'mo',mapMetric:'deaths_rate',mapClass:'all',mapCode:'all',mapScaleMax:'',dotUnit:'mo',dotMetric:'deaths_rate',dotClass:'all'};
+Object.assign(state,{dotDataset:'mortality',infraResources:'off',resourceIndicator:'doctors_rate',resourceYear:'2025',resourceSelected:'',resourceLayout:'rank'});
+const VIEWS={treemap:['Treemap МКБ-10','Класс → крупный блок → трёхзначный код. Нажмите на прямоугольник для детализации.'],heatmap:['Heatmap «территория × причина»','Строки — территории, столбцы — классы МКБ-10; перечень городов и районов зафиксирован для сопоставления периодов.'],arrow:['Arrow diagram рангов','Сопоставление позиций классов МКБ между годами или между мужчинами и женщинами.'],pyramid:['Возрастно-половая пирамида','Мужчины слева, женщины справа; доступен выбор класса МКБ-10.'],plot:['Медианный возраст и интервалы','Точка — медиана, толстый отрезок — Q1–Q3, тонкий — наблюдаемый диапазон.'],map:['Интерактивная карта смертности','Полигоны МО и точки НП в EPSG:3857 показывают число смертей, структуру или показатель на 1/10/100 тыс. населения'],dotogram:['Сравнение территорий','Одна точка — муниципалитет или НП; положение кодирует выбранный показатель, включая расчёт по населению выбранной группы.'],infrastructure:['Медицинская инфраструктура и доступность больниц','Медицинские учреждения, изохроны доступности от больниц 20 и 60 минут, границы МО и населённые пункты с размером по численности 2021 года.']};
+const METHOD={treemap:'Площадь — количество, доля или ПГПЖ-75. Цвет — изменение между периодами либо медианный возраст.',heatmap:'Для муниципальных территорий всегда показан полный перечень: сначала города, затем районы, внутри групп — по алфавиту. Порядок не меняется при переключении года и других фильтров; отсутствие наблюдений отображается нулём, отсутствие знаменателя — «нет данных». В 2024 году для МО используется население выбранной группы на 01.01.2024; остальные периоды без половозрастных фильтров используют фиксированную базу 2021 года.',arrow:'Ранг строится внутри каждой сравниваемой группы. Для регионов используются доли 2023–2025, для пола — выбранный период, для времени — 2023 и 2025.',pyramid:'Возрастные группы имеют шаг 5 лет; неизвестный возраст исключён. Доля считается отдельно внутри мужской и женской частей.',plot:'Интервалы описывают распределение возраста умерших и не являются доверительными интервалами риска.',map:'Карта построена в Web Mercator EPSG:3857. Размер знака НП определяется населением переписи 2021 года, цвет — выбранным показателем по пяти классам Дженкса. Коэффициенты за многолетний период рассчитываются в среднем за один год. Границы классов и верхнюю границу шкалы можно изменить вручную.',dotogram:'Dotogram позволяет видеть разброс территорий без площадного искажения карты. Основа коэффициента зависит от года, территории и выбранной группы; неподходящий знаменатель не подставляется.',infrastructure:'Карта отображается в Web Mercator EPSG:3857. Точки учреждений разделены по типам и управляются блочной панелью. Изохроны 20 и 60 минут показывают совокупную транспортную доступность именно от больниц; остальные типы учреждений не являются исходными точками изохрон. Размер НП определяется населением переписи 2021 года.'};
+const els={viz:document.getElementById('viz'),title:document.getElementById('chartTitle'),subtitle:document.getElementById('chartSubtitle'),meta:document.getElementById('chartMeta'),local:document.getElementById('localControls'),tip:document.getElementById('tooltip'),method:document.getElementById('methodText')};
+DATA.years.forEach(y=>document.getElementById('yearSelect').insertAdjacentHTML('beforeend',`<option value="${y}">${y}</option>`));
+const DEMO = window.AMUR_DEMO_BULLETIN;
+const demoMetric = key => DEMO.mortality[key] || DEMO.mortality.deaths_rate;
+const demoOptions = Object.entries(DEMO.mortality).map(([key, metric]) => [key, metric.label]);
+const demoMissing = 'Нет данных в сборнике для этого среза.';
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const fmt=v=>NF.format(Math.round(v||0)),pct=v=>`${DF.format(v||0)}%`;
+function agePass(a){return ANALYTICS_CORE.agePass(a,state.age)}
+function filtered(options={}){return ANALYTICS_CORE.filterRecords(DATA.records,{year:state.year,sex:state.sex,age:state.age},options)}
+function classOf(r){return ANALYTICS_CORE.classOf(r,DATA.codes)}function blockOf(r){return ANALYTICS_CORE.blockOf(r,DATA.codes)}
+function quantile(values,q){return ANALYTICS_CORE.quantile(values,q)}
+function stats(rows){return ANALYTICS_CORE.stats(rows)}
+function showTip(e,html){els.tip.innerHTML=html;els.tip.style.display='block';moveTip(e)}function moveTip(e){const w=els.tip.offsetWidth||330,h=els.tip.offsetHeight||160,p=12;let x=e.clientX+13,y=e.clientY+13;if(x+w>innerWidth-p)x=e.clientX-w-13;if(y+h>innerHeight-p)y=e.clientY-h-13;els.tip.style.left=`${Math.max(p,x)}px`;els.tip.style.top=`${Math.max(p,y)}px`}function hideTip(){els.tip.style.display='none'}
+function addTip(el,html){el.addEventListener('mouseenter',e=>showTip(e,typeof html==='function'?html():html));el.addEventListener('mousemove',moveTip);el.addEventListener('mouseleave',hideTip)}
+function selectField(id,label,options,value){return `<div class="field"><label for="${id}">${label}</label><select id="${id}">${options.map(o=>`<option value="${o[0]}" ${String(o[0])===String(value)?'selected':''}>${esc(o[1])}</option>`).join('')}</select></div>`}
+function classOptions(all='Все классы'){return [['all',all],...DATA.classes.map((c,i)=>[i,`${c.roman}. ${c.short}`])]}
+const mapCodes = new Map(DATA.codes.map(code => [code.code, code]));
+const fixedMunicipalityCount = () => state.mapUnit === 'mo' && state.mapMetric === 'n';
+const meanMunicipalityCount = () => fixedMunicipalityCount() && state.year === 'all';
+const mapCodeOptions = () => [['all','Все коды'], ...DATA.codes
+  .filter(code => state.mapClass === 'all' || code.class === Number(state.mapClass))
+  .map(code => [code.code, `${code.code} · ${code.label}`])];
+function territoryMetricOptions(base){return[...base,['per1k','На 1 000 населения'],['per10k','На 10 000 населения'],['per100k','На 100 000 населения']]}
+function bindSelect(id,key){const el=document.getElementById(id);if(el)el.onchange=()=>{state[key]=el.value;if(key==='plotLevel'&&el.value==='class')state.plotClass='all';render()}}
+function localControls(){
+  const focusedMapUnit = els.local.querySelector("#mapUnit button:focus")?.dataset.value;
+  let html='';
+  if(state.view==='treemap')html=selectField('treeMetric','Площадь',[['n','Количество смертей'],['share','Доля выборки'],['pgpzh','ПГПЖ-75']],state.treeMetric)+selectField('treeColor','Цвет',[['change','Изменение периодов'],['age','Медианный возраст']],state.treeColor);
+  if(state.view==='heatmap')html=selectField('heatUnit','Строки',[['mo','Муниципалитеты'],['settlement','Населённые пункты']],state.heatUnit)+selectField('heatMetric','Ячейка',territoryMetricOptions([['share','Доля класса в территории'],['n','Количество смертей']]),state.heatMetric)+(state.heatUnit==='settlement'?selectField('heatLimit','Показать территорий',[['25','Топ-25'],['50','Топ-50'],['all','Все']],state.heatLimit):'<div class="note">Города и районы показаны полностью и всегда расположены в одном порядке.</div>');
+  if(state.view==='arrow')html=selectField('arrowMode','Сравнение',[['time','2023 → 2025'],['sex','Мужчины → женщины']],state.arrowMode);
+  if(state.view==='pyramid')html=selectField('pyramidClass','Класс МКБ',classOptions(),state.pyramidClass)+selectField('pyramidMetric','Шкала',[['n','Количество'],['share','Доля внутри пола']],state.pyramidMetric);
+  if(state.view==='plot')html=selectField('plotLevel','Уровень',[['class','Класс МКБ'],['code','Трёхзначный код']],state.plotLevel)+(state.plotLevel==='code'?selectField('plotClass','Класс для кодов',classOptions('Все классы · топ-25'),state.plotClass):'');
+  if (state.view === 'map') {
+    const layerButtons = [['settlement','Населённые пункты'],['mo','Муниципалитеты']].map(([value,label])=>`<button type="button" data-value="${value}" aria-pressed="${state.mapUnit===value}">${label}</button>`).join('');
+    html = `
+      <div class="field"><label id="mapUnitLabel">Слой</label><div id="mapUnit" class="mortality-switch mortality-switch--layer" role="group" aria-labelledby="mapUnitLabel">
+        ${layerButtons}
+      </div></div>`
+      + selectField('mapClass','Класс МКБ-10',classOptions(),state.mapClass)
+      + selectField('mapCode','Код МКБ-10',[['all','Все коды']],state.mapCode)
+      + '<p class="site-map-palette-hint">Класс и код не меняют данные в демоверсии.</p>'
+      + selectField('mapMetric','Показатель',demoOptions,state.mapMetric)
+      + (fixedMunicipalityCount() ? '' : `<div class="field"><label for="mapScaleMax">Верхняя граница шкалы</label><div class="input-row"><input id="mapScaleMax" type="number" min="0" step="any" placeholder="Авто" value="${esc(state.mapScaleMax)}"><button id="mapScaleReset" type="button">Авто</button></div></div>`);
+  }
+  if(state.view==='dotogram')html=selectField('dotUnit','Единица',[['settlement','Населённый пункт'],['mo','Муниципалитет']],state.dotUnit)+selectField('dotClass','Класс МКБ-10',classOptions(),state.dotClass)+selectField('dotMetric','Положение точки',territoryMetricOptions([['n','Количество смертей'],['share','Доля выбранного класса'],['median','Медианный возраст'],['pgpzh','ПГПЖ-75']]),state.dotMetric);
+  if(state.view==='infrastructure')html='<div class="note"><b>Статический инфраструктурный контекст.</b> Изохроны рассчитаны от больниц. Фильтры периода, пола и возраста на этот слой не влияют. Включение типов учреждений, изохрон, МО и НП выполняется непосредственно слева от карты.</div>';
+  const activeRateMetric=state.view==='map'?state.mapMetric:state.view==='heatmap'?state.heatMetric:state.view==='dotogram'?state.dotMetric:null;
+  if(rateBase(activeRateMetric))html+=`<p class="rate-basis-note">${esc(rateBasisText())}</p>`;
+  els.local.innerHTML=html;
+  ['treeMetric','treeColor','heatUnit','heatMetric','heatLimit','arrowMode','pyramidClass','pyramidMetric','plotLevel','plotClass','mapMetric','dotUnit','dotClass','dotMetric'].forEach(id=>bindSelect(id,id));
+  const mapClass = document.getElementById('mapClass');
+  if (mapClass) mapClass.onchange = () => {
+    // Демонстрационный фильтр: выбор класса не меняет карту.
+  };
+  const mapCode = document.getElementById('mapCode');
+  if (mapClass) mapClass.title = 'В демоверсии выбор класса не меняет карту';
+  if (mapCode) mapCode.disabled = true;
+  els.local.querySelectorAll('#mapUnit button').forEach(button => {
+    button.onclick = () => {
+      const unit = button.dataset.value;
+      if (unit === state.mapUnit) return;
+      state.mapUnit = unit;
+      state.mapBreaks = '';
+      state.mapScaleMax = '';
+      render();
+    };
+  });
+  if (focusedMapUnit) els.local.querySelector(`#mapUnit [data-value="${focusedMapUnit}"]`)?.focus({preventScroll:true});
+  const scale=document.getElementById('mapScaleMax');if(scale){scale.max='1000000000';scale.onchange=()=>{if(!scale.checkValidity()){scale.reportValidity();return}state.mapScaleMax=scale.value;render()}};
+  const reset=document.getElementById('mapScaleReset');if(reset)reset.onclick=()=>{state.mapScaleMax='';render()}
+}
+function renderKpis(){document.querySelector('.kpis')?.setAttribute('hidden','');}
+function svg(tag,attrs={}){const e=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e}function textNode(parent,x,y,text,cls='axis-label',anchor='start'){const t=svg('text',{x,y,class:cls,'text-anchor':anchor});t.textContent=text;parent.appendChild(t);return t}
+function binaryLayout(items,x,y,w,h,out=[]){if(!items.length)return out;if(items.length===1){out.push({...items[0],x,y,w,h});return out}const total=items.reduce((s,d)=>s+d.value,0);let acc=0,split=1,best=Infinity;for(let i=1;i<items.length;i++){acc+=items[i-1].value;const diff=Math.abs(total/2-acc);if(diff<best){best=diff;split=i}}const a=items.slice(0,split),b=items.slice(split),sa=a.reduce((s,d)=>s+d.value,0);if(w>=h){const w1=w*sa/total;binaryLayout(a,x,y,w1,h,out);binaryLayout(b,x+w1,y,w-w1,h,out)}else{const h1=h*sa/total;binaryLayout(a,x,y,w,h1,out);binaryLayout(b,x,y+h1,w,h-h1,out)}return out}
+function treeItems(){const rows=filtered(),map=new Map();let definitions=[];if(state.treeType==='root')definitions=DATA.classes.map((d,i)=>({i,code:d.roman,label:d.short,color:d.color,match:r=>classOf(r)===i,next:'class'}));else if(state.treeType==='class')definitions=DATA.blocks.map((d,i)=>({d,i})).filter(x=>x.d.class===state.treeIndex).map(x=>({i:x.i,code:x.d.code,label:x.d.label,color:DATA.classes[x.d.class].color,match:r=>blockOf(r)===x.i,next:'block'}));else definitions=DATA.codes.map((d,i)=>({d,i})).filter(x=>x.d.block===state.treeIndex).map(x=>({i:x.i,code:x.d.code,label:x.d.label,color:DATA.classes[x.d.class].color,match:r=>r[3]===x.i,next:'code'}));definitions.forEach(d=>map.set(d.i,{...d,rows:[]}));rows.forEach(r=>{const idx=state.treeType==='root'?classOf(r):state.treeType==='class'?blockOf(r):r[3];if(map.has(idx))map.get(idx).rows.push(r)});const total=rows.length;return [...map.values()].filter(d=>d.rows.length).map(d=>{const s=stats(d.rows),value=state.treeMetric==='pgpzh'?s.pgpzh:state.treeMetric==='share'?s.n/Math.max(total,1)*100:s.n;return{...d,...s,value,change:treeChange(d)}}).sort((a,b)=>b.value-a.value)}
+function treeChange(item){const years=state.year==='all'?[[2023],[2025]]:[[Math.max(2023,+state.year-1)],[+state.year]];const vals=years.map(ys=>{const rows=filtered({years:ys,ignoreYear:true}).filter(item.match),s=stats(rows);return state.treeMetric==='pgpzh'?s.pgpzh/ys.length:s.n/ys.length});return vals[0]>0?(vals[1]-vals[0])/vals[0]*100:null}
+function ageColor(a){if(a==null)return'#aab2c0';const t=Math.max(0,Math.min(1,(a-35)/50)),x=[226,102,69],y=[42,105,181],c=x.map((v,i)=>Math.round(v+(y[i]-v)*t));return`rgb(${c.join(',')})`}function changeColor(c,base){if(c==null)return base;return c<0?`color-mix(in srgb, ${base}, white ${Math.min(55,Math.abs(c)*1.5)}%)`:`color-mix(in srgb, ${base}, #172033 ${Math.min(38,Math.abs(c))}%)`}
+function renderTreemap(){const items=treeItems();els.viz.innerHTML='<div class="treemap" id="tree"></div>';const tree=document.getElementById('tree'),w=Math.max(500,tree.clientWidth),h=tree.clientHeight,total=items.reduce((s,d)=>s+d.value,0);if(!items.length){tree.innerHTML='<div class="empty">Нет данных для выбранных фильтров.</div>';return}binaryLayout(items,0,0,w,h).forEach(d=>{const gap=1.4,W=Math.max(0,d.w-gap*2),H=Math.max(0,d.h-gap*2),b=document.createElement('button');b.className='tile'+(W<75||H<34?' tiny':W<150||H<70?' small':'');Object.assign(b.style,{left:`${d.x+gap}px`,top:`${d.y+gap}px`,width:`${W}px`,height:`${H}px`,background:state.treeColor==='age'?ageColor(d.median):changeColor(d.change,d.color)});b.innerHTML=`<span class="tile-inner"><span><span class="tile-code">${esc(d.code)}</span><span class="tile-label">${esc(d.label)}</span></span><span class="tile-value">${state.treeMetric==='share'?pct(d.value):fmt(d.value)} · ${pct(d.value/total*100)}</span></span>`;addTip(b,`<b>${esc(d.code)} · ${esc(d.label)}</b><div class="tip-grid"><span>Смертей</span><strong>${fmt(d.n)}</strong><span>Доля фильтра</span><strong>${pct(d.n/filtered().length*100)}</strong><span>ПГПЖ-75</span><strong>${fmt(d.pgpzh)}</strong><span>Медианный возраст</span><strong>${d.median==null?'н/д':DF.format(d.median)}</strong><span>Изменение</span><strong>${d.change==null?'н/д':(d.change>0?'+':'')+DF.format(d.change)+'%'}</strong></div>`);if(d.next!=='code')b.onclick=()=>{state.treeType=d.next;state.treeIndex=d.i;render()};tree.appendChild(b)});const crumbs=document.createElement('div');crumbs.className='breadcrumbs';const root=document.createElement('button');root.textContent='Все классы';root.className=state.treeType==='root'?'current':'';root.onclick=()=>{state.treeType='root';state.treeIndex=-1;render()};crumbs.appendChild(root);if(state.treeType!=='root'){const ci=state.treeType==='class'?state.treeIndex:DATA.blocks[state.treeIndex].class,c=DATA.classes[ci],bc=document.createElement('button');bc.textContent=`${c.roman} · ${c.short}`;bc.className=state.treeType==='class'?'current':'';bc.onclick=()=>{state.treeType='class';state.treeIndex=ci;render()};crumbs.appendChild(bc)}if(state.treeType==='block'){const b=DATA.blocks[state.treeIndex],bb=document.createElement('button');bb.textContent=b.code;bb.className='current';crumbs.appendChild(bb)}els.meta.appendChild(crumbs)}
+function territoryAggregate(unit){const defs=unit==='mo'?DATA.municipalities:DATA.settlements,table=ANALYTICS_CORE.aggregateTerritories(filtered(),DATA.codes,{unit,classCount:DATA.classes.length,selectedClass:'all',includeUnmappedCodes:false,collectRows:true});return{defs,table}}
+function populationValue(definition){return ANALYTICS_CORE.populationValue(definition)}
+function rateBase(metric){return ANALYTICS_CORE.rateBase(metric)}
+function ratePeriodYears(){return ANALYTICS_CORE.ratePeriodYears(state.year,DATA.years)}
+function rateYearsLabel(){return ANALYTICS_CORE.rateYearsLabel(ratePeriodYears())}
+function rateContext(){return {year:state.year,availableYears:DATA.years,sex:state.sex,age:state.age}}
+function rateUnit(){return state.view==='map'?state.mapUnit:state.view==='heatmap'?state.heatUnit:state.view==='dotogram'?state.dotUnit:'region'}
+function rateBasisText(unit=rateUnit()){
+  const subgroup=state.sex!=='all'||state.age!=='all';
+  if(String(state.year)==='2024'&&unit==='mo')return `Основа — население ${subgroup?'выбранной группы ':''}на 01.01.2024. Доступно для ${subgroup?'26':'28'} МО. «н/д» — нет подходящего населения для расчёта.`;
+  if(String(state.year)==='2024'&&unit==='region')return 'За 2024 год полного половозрастного населения области нет. Неполная сумма МО не используется для областного коэффициента.';
+  if(subgroup)return unit==='settlement'?'Половозрастного населения для НП нет. Коэффициент выбранной группы недоступен.':'Половозрастного населения за выбранный период нет. Коэффициент выбранной группы недоступен.';
+  return `Фиксированная база — перепись 2021 года. Смерти / население 2021${state.year==='all'?` / ${rateYearsLabel()}`:''}; ${state.year==='all'?'в среднем за один год':'за выбранный год'}.`;
+}
+function populationDisplay(definition,metric){return rateBase(metric)?ANALYTICS_CORE.resolvePopulation(definition,rateContext()):{value:populationValue(definition),label:'Население 2021',note:''}}
+function rateValue(count,definition,metric){return ANALYTICS_CORE.calculateRate(count,definition,metric,rateContext())?.value??null}
+function rateFormula(count,definition,metric){const c=ANALYTICS_CORE.calculateRate(count,definition,metric,rateContext());return c?`${fmt(c.count)} / ${fmt(c.population)}${c.periodYears>1?` / ${c.periodYears}`:''} × ${fmt(c.base)} · ${c.basis==='start_of_year'?'01.01.2024':'база 2021'}`:ANALYTICS_CORE.resolvePopulation(definition,rateContext()).note}
+function formatTerritoryMetric(metric,value){if(value==null||!Number.isFinite(value))return'н/д';return metric==='share'?pct(value):rateBase(metric)?DF.format(value):fmt(value)}
+function territoryMetricLabel(metric){return metric==='share'?'доля выбранного класса':metric==='per1k'?'на 1 000 населения':metric==='per10k'?'на 10 000 населения':metric==='per100k'?'на 100 000 населения':metric==='median'?'медианный возраст':metric==='pgpzh'?'ПГПЖ-75':'количество смертей'}
+function territoryMetric(metric,value,definition,classKey,totalRows){return ANALYTICS_CORE.territoryMetric({metric,aggregate:value,definition,selectedClass:classKey,totalRows,...rateContext()})}
+function renderHeatmap(){
+  const {defs,table}=territoryAggregate(state.heatUnit),isRate=Boolean(rateBase(state.heatMetric)),isMunicipality=state.heatUnit==='mo';
+  const emptyRow=idx=>({idx,total:0,classes:new Array(DATA.classes.length).fill(0),rows:[]});
+  const cellMetric=(row,classIndex)=>state.heatMetric==='share'?(row.total?row.classes[classIndex]/row.total*100:0):isRate?rateValue(row.classes[classIndex],defs[row.idx],state.heatMetric):row.classes[classIndex];
+  const rowMetric=row=>isRate?(rateValue(row.total,defs[row.idx],state.heatMetric)??-1):row.total;
+  const typeOrder={city:0,urban_settlement:1,district:2},stableCompare=(a,b)=>{const da=defs[a.idx],db=defs[b.idx],typeDelta=(typeOrder[da.municipalityType]??2)-(typeOrder[db.municipalityType]??2);return typeDelta||da.name.localeCompare(db.name,'ru-RU')};
+  const rows=isMunicipality?defs.map((_,idx)=>table.get(idx)||emptyRow(idx)).sort(stableCompare):[...table.values()].sort((a,b)=>rowMetric(b)-rowMetric(a)),limit=state.heatLimit==='all'?rows.length:+state.heatLimit,shown=isMunicipality?rows:rows.slice(0,limit),stableClasses=new Set(DATA.records.filter(row=>row[4]>=0).map(classOf)),active=DATA.classes.map((c,i)=>i).filter(i=>isMunicipality?stableClasses.has(i):shown.some(r=>r.classes[i]));
+  const wrap=document.createElement('div');wrap.className='heat-wrap';const grid=document.createElement('div');grid.className='heat-grid';grid.style.gridTemplateColumns=`minmax(155px,20%) repeat(${active.length},minmax(20px,1fr))`;grid.appendChild(document.createElement('div'));
+  active.forEach(i=>{const h=document.createElement('div');h.className='heat-head';h.textContent=`${DATA.classes[i].roman} ${DATA.classes[i].short}`;grid.appendChild(h)});
+  const metricValues=shown.flatMap(row=>active.map(index=>cellMetric(row,index))).filter(Number.isFinite),max=Math.max(1,...metricValues);
+  let previousGroup='';const groupNames={city:'Города',urban_settlement:'Посёлки городского типа',district:'Районы'};
+  shown.forEach(row=>{
+    const definition=defs[row.idx],population=populationDisplay(definition,state.heatMetric).value,territoryType=definition.municipalityType||'district';
+    if(isMunicipality&&territoryType!==previousGroup){const group=document.createElement('div');group.className='heat-group-label';group.textContent=groupNames[territoryType]||'Муниципальные территории';grid.appendChild(group);previousGroup=territoryType}
+    const label=document.createElement('div');label.className='heat-rowlabel';label.textContent=definition.name;grid.appendChild(label);
+    active.forEach(index=>{
+      const value=cellMetric(row,index),cell=document.createElement('div'),available=Number.isFinite(value),t=available?value/max:0;cell.className='heat-cell';cell.style.background=available?`rgb(${Math.round(240-177*t)},${Math.round(244-118*t)},${Math.round(250-35*t)})`:'#f2f4f7';cell.style.color=available&&t>.48?'#fff':'#42506a';cell.textContent=!available?'—':state.heatMetric==='share'?(row.total===0?'0':value>=2?DF.format(value):''):isRate?DF.format(value):row.total===0?'0':value||'';
+      addTip(cell,`<b>${esc(definition.name)} · ${DATA.classes[index].roman}</b><div class="tip-grid"><span>Смертей</span><strong>${fmt(row.classes[index])}</strong><span>${esc(populationDisplay(definition,state.heatMetric).label)}</span><strong>${population==null?'н/д':fmt(population)}</strong><span>${territoryMetricLabel(state.heatMetric)}</span><strong>${formatTerritoryMetric(state.heatMetric,value)}</strong>${isRate?`<span>Расчёт</span><strong>${rateFormula(row.classes[index],definition,state.heatMetric)}</strong>`:''}<span>Доля класса</span><strong>${row.total?pct(row.classes[index]/row.total*100):'0%'}</strong><span>Всего смертей</span><strong>${fmt(row.total)}</strong></div>`);grid.appendChild(cell)
+    })
+  });
+  wrap.appendChild(grid);wrap.insertAdjacentHTML('beforeend',`<div class="heat-scale"><span>0</span><i class="gradient"></i><span>максимум · ${territoryMetricLabel(state.heatMetric)}</span></div>`);els.viz.appendChild(wrap)
+}
+function classCounts(rows){return ANALYTICS_CORE.classCounts(rows,DATA.codes,DATA.classes.length)}function ranks(values){return ANALYTICS_CORE.rankValues(values)}
+function chartViewport(note=0){return{W:Math.max(760,Math.round(els.viz.clientWidth-2)),H:Math.max(360,Math.round(els.viz.clientHeight-note-2))}}
+function renderArrow(){let left,right,leftName,rightName,modeNote;if(state.arrowMode==='sex'){const base=filtered({ignoreSex:true});left=classCounts(base.filter(r=>r[1]===1));right=classCounts(base.filter(r=>r[1]===2));leftName='Мужчины';rightName='Женщины';modeNote='Ранг в выбранном периоде; фильтр пола игнорируется'}else{left=classCounts(filtered({years:[2023],ignoreYear:true}));right=classCounts(filtered({years:[2025],ignoreYear:true}));leftName='2023';rightName='2025';modeNote='Годовой ранг по числу смертей'}const lsum=left.reduce((a,b)=>a+b,0),rsum=right.reduce((a,b)=>a+b,0),lv=left.map(v=>v/lsum),rv=right.map(v=>v/rsum),lr=ranks(lv),rr=ranks(rv),lmap=new Map(lr.map(d=>[d.i,d])),rmap=new Map(rr.map(d=>[d.i,d])),keep=[...new Set([...lr.slice(0,15).map(d=>d.i),...rr.slice(0,15).map(d=>d.i)])],box=chartViewport(34),W=box.W,H=box.H,x1=Math.max(220,W*.24),x2=W-x1,top=48,step=(H-78)/(Math.max(...keep.map(i=>Math.max(lmap.get(i).rank,rmap.get(i).rank)))-1||1),S=svg('svg',{viewBox:`0 0 ${W} ${H}`,class:'svg-chart'});textNode(S,x1,25,leftName,'row-label','middle').setAttribute('font-weight','800');textNode(S,x2,25,rightName,'row-label','middle').setAttribute('font-weight','800');keep.forEach(i=>{const a=lmap.get(i),b=rmap.get(i),y1=top+(a.rank-1)*step,y2=top+(b.rank-1)*step,c=DATA.classes[i],line=svg('line',{x1,y1,x2,y2,stroke:c.color,'stroke-width':Math.abs(a.rank-b.rank)>3?4:2,opacity:.75});S.appendChild(line);S.appendChild(svg('circle',{cx:x1,cy:y1,r:5,fill:c.color}));S.appendChild(svg('circle',{cx:x2,cy:y2,r:5,fill:c.color}));textNode(S,x1-10,y1+4,`${a.rank}. ${c.roman} ${c.short}`,'row-label','end');textNode(S,x2+10,y2+4,`${b.rank}. ${c.roman} ${c.short}`,'row-label','start');addTip(line,`<b>${c.roman} · ${esc(c.short)}</b><div class="tip-grid"><span>${esc(leftName)}</span><strong>${a.rank} место · ${pct(a.v*100)}</strong><span>${esc(rightName)}</span><strong>${b.rank} место · ${pct(b.v*100)}</strong><span>Сдвиг</span><strong>${a.rank-b.rank>0?'↑ ':a.rank-b.rank<0?'↓ ':'— '}${Math.abs(a.rank-b.rank)}</strong></div>`) });els.viz.appendChild(S);els.viz.insertAdjacentHTML('beforeend',`<div class="chart-note">${esc(modeNote)}. Показаны классы, входящие в топ-15 хотя бы одной стороны.</div>`)}
+function age5(a){if(a<0)return null;if(a>=85)return 17;return Math.floor(a/5)}function renderPyramid(){const rows=filtered({ignoreSex:true}).filter(r=>state.pyramidClass==='all'||classOf(r)===+state.pyramidClass),M=new Array(18).fill(0),F=new Array(18).fill(0);rows.forEach(r=>{const b=age5(r[2]);if(b==null)return;if(r[1]===1)M[b]++;if(r[1]===2)F[b]++});const ms=M.reduce((a,b)=>a+b,0),fs=F.reduce((a,b)=>a+b,0),mv=state.pyramidMetric==='share'?M.map(v=>v/ms*100):M,fv=state.pyramidMetric==='share'?F.map(v=>v/fs*100):F,max=Math.max(...mv,...fv,1),box=chartViewport(),W=box.W,H=box.H,cx=W/2,top=38,rowH=(H-68)/18,barH=Math.max(11,Math.min(22,rowH*.68)),scale=(W*.36)/max,S=svg('svg',{viewBox:`0 0 ${W} ${H}`,class:'svg-chart'});S.appendChild(svg('line',{x1:cx,y1:25,x2:cx,y2:H-26,class:'axis'}));for(let b=17;b>=0;b--){const row=17-b,y=top+row*rowH,label=b===17?'85+':`${b*5}–${b*5+4}`,wm=mv[b]*scale,wf=fv[b]*scale;S.appendChild(svg('rect',{x:cx-wm-28,y:y-barH/2,width:wm,height:barH,rx:3,fill:'#3f7ed7'}));S.appendChild(svg('rect',{x:cx+28,y:y-barH/2,width:wf,height:barH,rx:3,fill:'#d85a87'}));textNode(S,cx,y+4,label,'row-label','middle');if(wm>28)textNode(S,cx-wm-34,y+4,state.pyramidMetric==='share'?pct(mv[b]):fmt(M[b]),'axis-label','end');if(wf>28)textNode(S,cx+wf+34,y+4,state.pyramidMetric==='share'?pct(fv[b]):fmt(F[b]),'axis-label','start')}textNode(S,W*.32,22,'Мужчины','row-label','middle').setAttribute('font-weight','800');textNode(S,W*.68,22,'Женщины','row-label','middle').setAttribute('font-weight','800');els.viz.appendChild(S)}
+function renderPlot(){const rows=filtered(),groups=new Map();rows.forEach(r=>{if(r[2]<0||r[3]<0)return;const k=state.plotLevel==='class'?classOf(r):r[3];if(state.plotLevel==='code'&&state.plotClass!=='all'&&classOf(r)!==+state.plotClass)return;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r[2])});let items=[...groups].map(([i,a])=>({i,n:a.length,min:Math.min(...a),q1:quantile(a,.25),med:quantile(a,.5),q3:quantile(a,.75),max:Math.max(...a)})).filter(d=>d.n>=5).sort((a,b)=>b.n-a.n);if(state.plotLevel==='code')items=items.slice(0,25);const box=chartViewport(),W=box.W,H=box.H,left=Math.max(245,Math.min(330,W*.28)),right=28,top=22,bottom=30,rowH=(H-top-bottom)/Math.max(items.length,1),scale=x=>left+x/110*(W-left-right),S=svg('svg',{viewBox:`0 0 ${W} ${H}`,class:'svg-chart'});for(let a=0;a<=110;a+=10){const x=scale(a);S.appendChild(svg('line',{x1:x,y1:top,x2:x,y2:H-bottom,class:'gridline'}));textNode(S,x,H-9,a,'axis-label','middle')}items.forEach((d,row)=>{const y=top+row*rowH+rowH/2,def=state.plotLevel==='class'?DATA.classes[d.i]:DATA.codes[d.i],label=state.plotLevel==='class'?`${def.roman}. ${def.short}`:`${def.code} · ${def.label}`;textNode(S,left-12,y+4,label.length>39?label.slice(0,38)+'…':label,'row-label','end');S.appendChild(svg('line',{x1:scale(d.min),y1:y,x2:scale(d.max),y2:y,stroke:'#9da9ba','stroke-width':1.5}));S.appendChild(svg('line',{x1:scale(d.q1),y1:y,x2:scale(d.q3),y2:y,stroke:state.plotLevel==='class'?def.color:DATA.classes[def.class].color,'stroke-width':Math.max(5,Math.min(9,rowH*.48)),'stroke-linecap':'round'}));const dot=svg('circle',{cx:scale(d.med),cy:y,r:4.5,fill:'#172033'});S.appendChild(dot);addTip(dot,`<b>${esc(label)}</b><div class="tip-grid"><span>n</span><strong>${fmt(d.n)}</strong><span>Медиана</span><strong>${DF.format(d.med)}</strong><span>Q1–Q3</span><strong>${DF.format(d.q1)}–${DF.format(d.q3)}</strong><span>Диапазон</span><strong>${DF.format(d.min)}–${DF.format(d.max)}</strong></div>`) });els.viz.appendChild(S)}
+function mapRamp(value){const t=Math.max(0,Math.min(1,value)),a=[229,242,244],b=[17,91,112],c=a.map((v,i)=>Math.round(v+(b[i]-v)*t));return`rgb(${c.join(',')})`}function project(x,y,W,H){const [minX,minY,maxX,maxY]=DATA.mapBounds3857,s=Math.min((W-90)/(maxX-minX),(H-70)/(maxY-minY)),ox=(W-(maxX-minX)*s)/2,oy=(H-(maxY-minY)*s)/2;return[ox+(x-minX)*s,oy+(maxY-y)*s]}function geoPath(g,W,H){let d='';const polys=g.type==='Polygon'?[g.coordinates]:g.coordinates;polys.forEach(poly=>poly.forEach(ring=>{ring.forEach((p,i)=>{const q=project(p[0],p[1],W,H);d+=(i?'L':'M')+q[0].toFixed(1)+','+q[1].toFixed(1)});d+='Z'}));return d}
+function geoValues(unit,clsKey){const defs=unit==='mo'?DATA.municipalities:DATA.settlements,map=ANALYTICS_CORE.aggregateTerritories(filtered(),DATA.codes,{unit,classCount:DATA.classes.length,selectedClass:clsKey,includeUnmappedCodes:true,collectRows:false});if(unit==='mo')defs.forEach((_,idx)=>{if(!map.has(idx))map.set(idx,{idx,total:0,selected:0,classes:new Array(DATA.classes.length).fill(0),rows:[],ages:[],pgpzh:0})});return{defs,map}}
+function topClasses(x){return x.classes.map((v,i)=>({i,v})).sort((a,b)=>b.v-a.v).slice(0,3).filter(d=>d.v).map(d=>`${DATA.classes[d.i].roman} ${pct(d.v/x.total*100)}`).join(' · ')}
+let spatialFallbackPromise=null,spatialFallbackError=null;
+function renderSpatialFallbackState(){
+  const failed=Boolean(spatialFallbackError);
+  els.viz.innerHTML=`<div class="atlas-data-state" role="${failed?'alert':'status'}" aria-live="polite"><span class="atlas-data-state__icon" aria-hidden="true">${failed?'!':'◌'}</span><div><b>${failed?'Не удалось загрузить резервную геометрию':'Подготавливаем резервную карту'}</b><p>${failed?esc(spatialFallbackError.message||spatialFallbackError):'Основные данные уже доступны. Загружаются только границы и координаты для SVG-режима.'}</p></div>${failed?'<button type="button" class="atlas-data-state__retry">Повторить</button>':''}</div>`;
+  els.viz.querySelector('.atlas-data-state__retry')?.addEventListener('click',()=>{spatialFallbackError=null;spatialFallbackPromise=null;ensureSpatialFallback(true)});
+}
+function ensureSpatialFallback(retry=false){
+  const loader=window.AmurAtlasDataLoader;
+  if(loader?.isSpatialReady?.())return true;
+  renderSpatialFallbackState();
+  if(!loader){spatialFallbackError=new Error('Модуль пространственных данных недоступен.');renderSpatialFallbackState();return false}
+  if(!spatialFallbackPromise){
+    spatialFallbackPromise=(retry?loader.retrySpatial():loader.loadSpatial()).then(()=>{spatialFallbackPromise=null;spatialFallbackError=null;if(state.view==='map')render()}).catch(error=>{spatialFallbackPromise=null;spatialFallbackError=error instanceof Error?error:new Error(String(error));if(state.view==='map')renderSpatialFallbackState()});
+  }
+  return false;
+}
+function renderMap(){
+  if(!ensureSpatialFallback())return;
+  const W=760,H=790,{defs,map}=geoValues(state.mapUnit,state.mapClass),values=[...map.values()];
+  const metric=x=>territoryMetric(state.mapMetric,x,defs[x.idx],state.mapClass,filtered().length),metricValues=values.map(metric).filter(Number.isFinite);
+  const autoMax=Math.max(1,...metricValues),manualMax=Number(state.mapScaleMax),scaleMax=manualMax>0?manualMax:autoMax;
+  const maxTotal=Math.max(...values.map(v=>v.total),1),sizeMax=manualMax>0&&state.mapUnit==='settlement'&&state.mapClass==='all'&&state.mapMetric==='n'?manualMax:maxTotal;
+  const numericColor=state.mapUnit==='mo'||state.mapClass!=='all'||state.mapMetric==='share'||Boolean(rateBase(state.mapMetric)),S=svg('svg',{viewBox:`0 0 ${W} ${H}`,class:'svg-chart'});
+  DATA.municipalities.forEach((m,i)=>{const v=state.mapUnit==='mo'?map.get(i):null,value=v?metric(v):null,t=Number.isFinite(value)?Math.min(1,value/scaleMax):0,path=svg('path',{d:geoPath(m.geometry,W,H),fill:state.mapUnit==='mo'?(Number.isFinite(value)?mapRamp(t):'#e5e7eb'):'#e8eff5',stroke:'#fff','stroke-width':1.2});S.appendChild(path);if(v)addTip(path,`<b>${esc(m.name)}</b><div class="tip-grid"><span>${territoryMetricLabel(state.mapMetric)}</span><strong>${formatTerritoryMetric(state.mapMetric,value)}</strong>${rateBase(state.mapMetric)?`<span>Расчёт</span><strong>${rateFormula(v.selected,m,state.mapMetric)}</strong>`:''}<span>${esc(populationDisplay(m,state.mapMetric).label)}</span><strong>${populationDisplay(m,state.mapMetric).value==null?'н/д':fmt(populationDisplay(m,state.mapMetric).value)}</strong><span>Всего смертей</span><strong>${fmt(v.total)}</strong><span>Выбрано</span><strong>${fmt(v.selected)}</strong><span>Доля класса</span><strong>${pct(v.total?v.selected/v.total*100:0)}</strong><span>Топ классов</span><strong>${esc(topClasses(v))}</strong></div>`) });
+  if(state.mapUnit==='settlement')values.sort((a,b)=>b.total-a.total).forEach(v=>{const p=defs[v.idx],value=metric(v),q=project(p.x3857,p.y3857,W,H),dominant=v.classes.indexOf(Math.max(...v.classes)),radius=2.5+14.5*Math.sqrt(Math.min(v.total,sizeMax)/sizeMax),fill=numericColor?(Number.isFinite(value)?mapRamp(value/scaleMax):'#98a2b3'):DATA.classes[dominant]?.color||'#61758a',circle=svg('circle',{cx:q[0],cy:q[1],r:radius,fill,stroke:'#fff','stroke-width':1.25,opacity:.86});S.appendChild(circle);addTip(circle,`<b>${esc(p.name)} · ID слоя ${p.id}</b><div class="tip-grid"><span>Муниципалитет</span><strong>${esc(p.municipality)}</strong><span>${territoryMetricLabel(state.mapMetric)}</span><strong>${formatTerritoryMetric(state.mapMetric,value)}</strong>${rateBase(state.mapMetric)?`<span>Расчёт</span><strong>${rateFormula(v.selected,p,state.mapMetric)}</strong>`:''}<span>${esc(populationDisplay(p,state.mapMetric).label)}</span><strong>${populationDisplay(p,state.mapMetric).value==null?'н/д':fmt(populationDisplay(p,state.mapMetric).value)}</strong><span>Всего смертей</span><strong>${fmt(v.total)}</strong><span>Выбрано</span><strong>${fmt(v.selected)}</strong><span>Доля класса</span><strong>${pct(v.total?v.selected/v.total*100:0)}</strong><span>EPSG:3857</span><strong>${fmt(p.x3857)}; ${fmt(p.y3857)}</strong><span>Структура</span><strong>${esc(topClasses(v))}</strong></div>`) });
+  const unit=state.mapMetric==='share'?'%':rateBase(state.mapMetric)?'':'смертей',maxLabel=formatTerritoryMetric(state.mapMetric,scaleMax),dominants=new Map();values.forEach(v=>{const d=v.classes.indexOf(Math.max(...v.classes));if(d>=0)dominants.set(d,(dominants.get(d)||0)+1)});const categoryLegend=[...dominants].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([i])=>`<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 6px 2px 0"><i style="width:9px;height:9px;border-radius:50%;background:${DATA.classes[i].color}"></i>${DATA.classes[i].roman}</span>`).join('');
+  const rateLegendNote=rateBase(state.mapMetric)?`<div class="site-map-legend-note">${esc(rateBasisText(state.mapUnit))}</div>`:'';
+  const colorLegend=numericColor?`<b>Цвет · ${territoryMetricLabel(state.mapMetric)}</b><div class="legend-ramp"></div><div class="legend-range"><span>0 ${unit}</span><span>${maxLabel}</span></div>${rateLegendNote}`:`<b>Цвет · ведущий класс МКБ-10</b><div>${categoryLegend}</div>`;
+  const sizeLegend=state.mapUnit==='settlement'?`<div class="size-legend"><span>Размер · смерти</span><i class="size-dot" style="width:8px;height:8px"></i><span>${fmt(sizeMax*.25)}</span><i class="size-dot" style="width:13px;height:13px"></i><span>${fmt(sizeMax*.6)}</span><i class="size-dot" style="width:19px;height:19px"></i><span>${fmt(sizeMax)}</span></div>`:'';
+  const ranked=values.filter(v=>Number.isFinite(metric(v))).sort((a,b)=>metric(b)-metric(a)).slice(0,15);
+  const layout=document.createElement('div');layout.className='map-layout';const left=document.createElement('div');left.appendChild(S);const side=document.createElement('aside');side.className='map-side';side.innerHTML=`<div class="map-legend"><b>Проекция · EPSG:3857</b>${colorLegend}${sizeLegend}<div class="legend-range"><span>${manualMax>0?'шкала задана вручную':'автомасштаб по фильтру'}</span><span>Web Mercator</span></div></div><h3>Наибольшие значения</h3><div class="rank-list">${ranked.map((v,i)=>`<div class="rank-item"><span>${i+1}. ${esc(defs[v.idx].name)}</span><b>${formatTerritoryMetric(state.mapMetric,metric(v))}</b></div>`).join('')}</div>`;layout.append(left,side);els.viz.appendChild(layout);els.meta.insertAdjacentHTML('beforeend','<span class="chip">EPSG:3857 · Web Mercator</span>')}
+function hashJitter(i){return ((i*9301+49297)%233280)/233280}function renderDotogram(){if(window.AmurDotogramAnalysis?.enhanced)return;const {defs,map}=geoValues(state.dotUnit,state.dotClass),values=[...map.values()],metric=x=>state.dotMetric==='share'?(state.dotClass==='all'?x.total/Math.max(filtered().length,1)*100:x.selected/x.total*100):state.dotMetric==='median'?quantile(x.ages,.5):state.dotMetric==='pgpzh'?x.pgpzh:x.selected;values.forEach(v=>v.value=metric(v));const max=Math.max(...values.map(v=>v.value||0),1),min=state.dotMetric==='median'?Math.min(...values.map(v=>v.value??999)):0,W=1050,H=650,left=85,right=35,top=45,bottom=70,scale=v=>left+(v-min)/(max-min||1)*(W-left-right),S=svg('svg',{viewBox:`0 0 ${W} ${H}`,class:'svg-chart'});for(let i=0;i<=5;i++){const val=min+(max-min)*i/5,x=scale(val);S.appendChild(svg('line',{x1:x,y1:top,x2:x,y2:H-bottom,class:'gridline'}));textNode(S,x,H-35,state.dotMetric==='share'?pct(val):state.dotMetric==='median'?DF.format(val):fmt(val),'axis-label','middle')}values.forEach(v=>{const d=defs[v.idx],mo=state.dotUnit==='settlement'?d.municipalityIndex:v.idx,y=top+hashJitter(v.idx)*(H-top-bottom),c=DATA.classes[v.classes.indexOf(Math.max(...v.classes))]?.color||'#667085',dot=svg('circle',{cx:scale(v.value||0),cy:y,r:state.dotUnit==='mo'?8:5,fill:state.dotUnit==='settlement'?DATA.classes[mo%DATA.classes.length].color:c,opacity:.78,stroke:'#fff','stroke-width':1});S.appendChild(dot);addTip(dot,`<b>${esc(d.name)}</b><div class="tip-grid"><span>Значение</span><strong>${state.dotMetric==='share'?pct(v.value):state.dotMetric==='median'?DF.format(v.value):fmt(v.value)}</strong><span>Всего</span><strong>${fmt(v.total)}</strong><span>Выбранная причина</span><strong>${fmt(v.selected)}</strong><span>Структура</span><strong>${esc(topClasses(v))}</strong></div>`) });textNode(S,W/2,H-10,state.dotMetric==='n'?'Количество смертей':state.dotMetric==='share'?'Доля, %':state.dotMetric==='median'?'Медианный возраст, лет':'ПГПЖ-75','row-label','middle');els.viz.appendChild(S);els.viz.insertAdjacentHTML('beforeend',`<div class="chart-note">Каждая точка — ${state.dotUnit==='mo'?'муниципалитет':'населённый пункт'}. Вертикальное положение служит только для разведения точек и не является показателем.</div>`)}
+function renderInfrastructure(){if(window.AmurInfrastructureMap)window.AmurInfrastructureMap.mount(els.viz);else els.viz.innerHTML='<div class="empty">Модуль инфраструктурной карты не загружен.</div>'}
+function render(){const infrastructureView=state.view==='infrastructure';document.body.classList.toggle('infrastructure-view',infrastructureView);localControls();renderKpis();els.title.textContent=VIEWS[state.view][0];els.subtitle.textContent=VIEWS[state.view][1];els.method.textContent=METHOD[state.view];els.meta.innerHTML=infrastructureView?'<span class="chip">статическая инфраструктура</span><span class="chip">население 2021</span><span class="chip">EPSG:3857</span>':`<span class="chip">${state.year==='all'?'2023–2025':state.year}</span><span class="chip">${state.sex==='all'?'оба пола':state.sex==='1'?'мужчины':'женщины'}</span><span class="chip">${document.querySelector(`#ageSelect option[value="${state.age}"]`)?.textContent||'все возрасты'}</span>`;els.viz.innerHTML='';({treemap:renderTreemap,heatmap:renderHeatmap,arrow:renderArrow,pyramid:renderPyramid,plot:renderPlot,map:renderMap,dotogram:renderDotogram,infrastructure:renderInfrastructure}[state.view])()}
+document.querySelectorAll('.viz-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.viz-btn').forEach(x=>x.classList.toggle('active',x===b));state.view=b.dataset.view;render()});document.getElementById('yearSelect').onchange=e=>{state.year=e.target.value;render()};document.getElementById('ageSelect').onchange=e=>{state.age=e.target.value;render()};document.querySelectorAll('#sexSeg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#sexSeg button').forEach(x=>x.classList.toggle('active',x===b));state.sex=b.dataset.value;render()});
+let rt, lastChartViewportWidth = innerWidth;
+addEventListener('resize', () => {
+  const widthChanged = innerWidth !== lastChartViewportWidth;
+  lastChartViewportWidth = innerWidth;
+  // Mobile browser toolbars change the viewport height during scrolling.
+  // The compact charts flow vertically and need no redraw in that case.
+  if (!widthChanged && innerWidth <= 700 && ['arrow', 'pyramid', 'plot', 'dotogram'].includes(state.view)) return;
+  clearTimeout(rt);
+  rt = setTimeout(() => { if (state.view === 'infrastructure') window.AmurInfrastructureMap?.resize?.(); else render(); }, 150);
+});
+addEventListener('DOMContentLoaded',()=>{if(!els.viz.childElementCount)render()},{once:true});
+</script></body></html>

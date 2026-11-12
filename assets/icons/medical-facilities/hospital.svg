@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="title">
+  <title id="title">Больница</title>
+  <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="7" fill="#2563EB" stroke="#0F2740" stroke-opacity=".28" stroke-width=".75"/>
+  <path fill="#fff" d="M7 27.5V14h5V7.5h8V14h5v13.5H7Z"/>
+  <path fill="#2563EB" d="M14.75 9.2h2.5v2.05h2.05v2.5h-2.05v2.05h-2.5v-2.05H12.7v-2.5h2.05V9.2ZM9.5 17h2v2h-2v-2Zm0 4h2v2h-2v-2Zm5.5-3h2v2h-2v-2Zm0 4h2v5.5h-2V22Zm5.5-5h2v2h-2v-2Zm0 4h2v2h-2v-2Z"/>
+</svg>

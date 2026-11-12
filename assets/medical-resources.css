@@ -1,0 +1,84 @@
+.medical-resources { color: #243d50; font-size: 13px; line-height: 1.5; min-width: 0; }
+.medical-resources--infrastructure { padding: 12px; border-bottom: 1px solid #d8e1eb; }
+.medical-resources--comparison { padding: 12px 16px; }
+.medical-resources p { margin: 10px 0; overflow-wrap: anywhere; }
+.resource-mode { display: flex; gap: 6px; }
+.medical-resources button { font: inherit; color: inherit; padding: 8px 10px; background: #f7f9fc; border: 1px solid #bacadb; border-radius: 6px; cursor: pointer; }
+.medical-resources button[aria-pressed="true"], .react-dotogram-choice button[aria-pressed="true"] { color: #124777; background: #e4effb; border-color: #2166ac; }
+.medical-resources label { display: grid; gap: 6px; min-width: 0; margin: 8px 0; }
+.medical-resources select { width: 100%; min-width: 0; font: inherit; color: inherit; border: 1px solid #bacadb; border-radius: 6px; padding: 8px; background: #fff; }
+.resource-fields { display: grid; grid-template-columns: minmax(0,1fr) 150px; gap: 12px; }
+.medical-resources--infrastructure .resource-fields { grid-template-columns: minmax(0,1fr); gap: 0; }
+.resource-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
+.resource-legend > i { width: 90px; height: 10px; background: linear-gradient(to right,#edf4fc,#2166ac); }
+.resource-legend small i { display: inline-block; width: 12px; height: 12px; background: #d9dfe5; vertical-align: middle; }
+.medical-resources table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 12px 0; font-variant-numeric: tabular-nums; }
+.medical-resources th, .medical-resources td { padding: 8px; border-bottom: 1px solid #dce5ee; overflow-wrap: anywhere; text-align: right; }
+.medical-resources th:first-child { text-align: left; }
+.medical-resources--comparison-filters .resource-fields { grid-template-columns: minmax(0,1fr); gap: 0; }
+.resource-comparison-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.resource-comparison-toolbar button { padding: 5px 8px; font-size: 12px; }
+.resource-comparison-overview { margin-bottom: 8px; }
+.resource-comparison-overview p { margin: 0 0 3px; }
+.resource-comparison-scale, .resource-comparison-actions { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.resource-comparison-scale { color: #536878; font-size: 12px; }
+.resource-comparison-actions { flex: 0 0 auto; }
+.resource-comparison-menu, .resource-comparison-pager { display: none; }
+.resource-comparison-series { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px; margin-bottom: 10px; padding: 6px 10px; border: 1px solid #d8e1eb; border-radius: 6px; background: #fff; }
+.resource-comparison-series h4 { margin: 0; font-size: 14px; font-weight: 600; }
+.resource-year-buttons { display: flex; gap: 5px; font-variant-numeric: tabular-nums; }
+.resource-year-buttons button { display: flex; justify-content: center; align-items: baseline; gap: 5px; padding: 4px 8px; font-size: 12px; }
+.resource-year-buttons strong { font-weight: 700; }
+.resource-comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; align-items: start; }
+.medical-resources .resource-comparison-table { margin: 0; background: #fff; }
+.medical-resources .resource-comparison-table :is(th,td) { padding: 4px 6px; line-height: 18px; }
+.resource-comparison-table thead { background: #edf3f7; }
+.resource-comparison-table th:first-child { width: 53%; }
+.resource-comparison-table th:nth-child(2) { width: 24%; }
+.resource-comparison-table--years th:first-child { width: 46%; }
+.resource-comparison-table--years th:nth-child(n+2) { width: 18%; }
+.resource-comparison-table--years .is-current { background: #eaf2fb; }
+.resource-comparison-table th { font-weight: 500; }
+.resource-comparison-table button { text-align: left; width: 100%; background: transparent; border: 0; padding: 0; line-height: inherit; overflow-wrap: anywhere; }
+.resource-comparison-table tr:has(button[aria-pressed="true"]) { background: #e4effb; }
+.resource-comparison-table [data-resource-available="false"] td { color: #536878; }
+.medical-resources--comparison .resource-source { margin: 6px 0 0; }
+.resource-bar { display: block; height: 10px; background: #edf1f6; }
+.resource-bar i { display: block; height: 100%; background: #2166ac; }
+.resource-series h4 { font-size: 14px; font-weight: 600; }
+.resource-source { color: #596d80; font-size: 12px; }
+.medical-resources :is(button,select):focus-visible { outline: 2px solid #2166ac; outline-offset: 2px; }
+body.hybrid-ui.medical-comparison .atlas-main .content { grid-template-columns: minmax(0,1fr); }
+body.app-interface-v2.hybrid-ui:is(.medical-comparison,[data-shell-view="infrastructure"]) .atlas-main { grid-template-rows: var(--app-header-h) 0 minmax(0,1fr); }
+body.app-interface-v2.hybrid-ui:is(.medical-comparison,[data-shell-view="infrastructure"]) .atlas-main .workspace { grid-row: 3; }
+body.hybrid-ui.medical-comparison :is(.chart-meta,.mobile-tools,.mobile-chart-hint) { display: none !important; }
+body.hybrid-ui[data-shell-view="infrastructure"] .global-filterbar { display: none !important; }
+body.medical-comparison :is(.hybrid-inspector,.hybrid-inspector-toggle,.mobile-inspector-toggle,.global-filterbar,.horizontal-scroll-hint) { display: none !important; }
+body.medical-comparison #viz { overflow: auto; }
+body.medical-comparison .mobile-filter-toggle { display: none; }
+@media(max-width:600px) { .resource-fields { grid-template-columns: minmax(0,1fr); gap: 0; } .medical-resources--comparison { padding: 12px; } .medical-resources th, .medical-resources td { padding: 6px 2px; } }
+@media(max-width:1023px) { body.app-interface-v2.hybrid-ui:is(.medical-comparison,[data-shell-view="infrastructure"]) .atlas-main { grid-template-rows: auto 0 minmax(0,1fr); } }
+@media(max-width:1023px) {
+  .medical-resources--comparison { padding: 6px 8px; font-size: 12px; }
+  .resource-comparison-toolbar { margin-bottom: 4px; }
+  .resource-comparison-toolbar :is(button,summary) { min-height: 32px; }
+  .resource-comparison-actions { display: none; }
+  .resource-comparison-menu { display: block; position: relative; }
+  .resource-comparison-menu summary { display: grid; place-items: center; padding: 4px 8px; border: 1px solid #bacadb; border-radius: 6px; background: #f7f9fc; cursor: pointer; }
+  .resource-comparison-menu > div { position: absolute; z-index: 2; right: 0; top: calc(100% + 4px); display: grid; gap: 4px; width: 216px; padding: 6px; border: 1px solid #bacadb; border-radius: 6px; background: #fff; box-shadow: 0 4px 12px #15395726; }
+  .resource-comparison-overview { margin-bottom: 4px; }
+  .resource-comparison-scale { font-size: 11px; gap: 4px 8px; }
+  .resource-comparison-scale .resource-legend { gap: 4px; }
+  .resource-comparison-scale .resource-legend > i { width: 36px; }
+  .resource-comparison-series { display: grid; gap: 3px; padding: 4px 6px; margin-bottom: 5px; }
+  .resource-comparison-series h4 { font-size: 13px; }
+  .resource-year-buttons { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .resource-year-buttons button { align-items: center; flex-wrap: wrap; min-height: 34px; padding: 2px 3px; gap: 0 4px; font-size: 11px; }
+  .resource-comparison-grid { grid-template-columns: minmax(0,1fr); }
+  .medical-resources .resource-comparison-table :is(th,td) { padding: 2px 4px; line-height: 16px; }
+  .resource-comparison-table button { min-height: 26px; }
+  .resource-comparison-pager { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 4px; }
+  .resource-comparison-pager button { min-width: 68px; min-height: 34px; padding: 3px 7px; }
+  .resource-comparison-pager button:disabled { opacity: .5; cursor: default; }
+  .medical-resources--comparison .resource-source { margin-top: 4px; font-size: 10px; }
+}

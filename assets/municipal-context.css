@@ -1,0 +1,13 @@
+.municipal-context { margin: 12px 0; border: 1px solid #d8e1eb; border-radius: 8px; background: #fff; color: #243d50; }
+.municipal-context summary { padding: 12px; font-size: 13px; font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
+.municipal-context__body { padding: 0 12px 12px; min-width: 0; }
+.municipal-context p { font-size: 12px; line-height: 1.5; margin: 8px 0; overflow-wrap: anywhere; }
+.municipal-context__territory { font-weight: 600; }
+.municipal-context label { display: grid; gap: 6px; font-size: 12px; }
+.municipal-context select { width: 100%; min-width: 0; padding: 8px; font: inherit; color: inherit; background: #fff; border: 1px solid #bacadb; border-radius: 6px; }
+.municipal-context table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; font-variant-numeric: tabular-nums; }
+.municipal-context th, .municipal-context td { text-align: right; padding: 8px 2px; border-bottom: 1px solid #e4eaf1; overflow-wrap: anywhere; }
+.municipal-context th:first-child { text-align: left; width: 20%; }
+.municipal-context thead th { font-weight: 500; font-size: 11px; }
+.municipal-context button { padding: 8px 10px; border: 1px solid #bacadb; border-radius: 6px; color: inherit; background: #f6f9fc; cursor: pointer; font: inherit; font-size: 12px; }
+.municipal-context :is(summary, select, button):focus-visible { outline: 2px solid #2168ae; outline-offset: 2px; }

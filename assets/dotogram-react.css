@@ -1,0 +1,72 @@
+/* React settings and analytical context for Dotogram. SVG remains in site.js. */
+.react-dotogram-controls-host[hidden],
+.react-dotogram-inspector-host[hidden] { display: none !important; }
+
+.drawer-scroll.is-react-dotogram-owned > [data-legacy-local-controls],
+.hybrid-inspector__body.is-react-dotogram-owned > [data-legacy-hybrid-inspector-content] { display: none !important; }
+
+.drawer-scroll.is-react-dotogram-owned > .react-dotogram-controls-host,
+.hybrid-inspector__body.is-react-dotogram-owned > .react-dotogram-inspector-host { display: block; min-width: 0; }
+.hybrid-inspector__body.is-react-dotogram-owned { padding: 8px; }
+
+.react-dotogram-controls { display: grid; gap: 9px; padding-top: 10px; border-top: 1px dashed #d8dfeb; }
+.react-dotogram-choice,
+.react-dotogram-field { display: grid; min-width: 0; gap: 4px; }
+.react-dotogram-choice > span,
+.react-dotogram-field > span { color: #47536a; font-size: 8px; font-weight: 900; }
+.react-dotogram-choice > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.react-dotogram-choice button {
+  min-width: 0; min-height: 34px; padding: 6px 5px; border: 1px solid #d5deea; border-radius: 8px;
+  background: #f8fafc; color: #53637a; cursor: pointer; font-size: 7.8px; font-weight: 850;
+}
+.react-dotogram-choice button:hover { border-color: #91b3d2; }
+.react-dotogram-choice button.is-active { border-color: #2f75b8; background: #e8f2fd; color: #155594; box-shadow: inset 0 0 0 1px rgba(47,117,184,.1); }
+.react-dotogram-field select {
+  width: 100%; min-height: 35px; padding: 7px 8px; border: 1px solid #cfd9e6; border-radius: 8px;
+  background: #fff; color: #172f4b; font-size: 8.8px;
+}
+.react-dotogram-note { margin: 0; padding: 8px 9px; border-left: 3px solid #3b7eb9; border-radius: 8px; background: #eef5fb; color: #4a617a; font-size: 7.5px; line-height: 1.42; }
+.react-dotogram-note.is-warning { border-left-color: #d49a18; background: #fff8e8; color: #65552e; }
+
+.react-dotogram-inspector { display: grid; min-width: 0; gap: 8px; animation: hybrid-panel-in 180ms cubic-bezier(.2,.8,.2,1) both; }
+.react-dotogram-card { min-width: 0; padding: 9px; border: 1px solid #dce5ed; border-radius: 11px; background: #fff; }
+.react-dotogram-kicker { display: block; margin-bottom: 5px; color: #74879b; font-size: 7px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.react-dotogram-selection h4 { margin: 0; overflow-wrap: anywhere; color: #17324d; font-size: 12px; line-height: 1.25; }
+.react-dotogram-selection > p { margin: 4px 0 0; color: #718096; font-size: 7.5px; line-height: 1.35; }
+.react-dotogram-primary { display: grid; margin-top: 10px; }
+.react-dotogram-primary strong { color: #153f6d; font-size: 22px; line-height: 1; }
+.react-dotogram-primary span { margin-top: 3px; color: #718096; font-size: 7.5px; }
+.react-dotogram-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+.react-dotogram-metrics > div { min-width: 0; padding: 7px; border-radius: 8px; background: #f3f6f9; }
+.react-dotogram-metrics span { display: block; color: #75869a; font-size: 6.8px; line-height: 1.2; }
+.react-dotogram-metrics b { display: block; margin-top: 3px; overflow: hidden; color: #203b58; font-size: 8.5px; text-overflow: ellipsis; white-space: nowrap; }
+.react-dotogram-insight { margin: 0; padding: 8px; border-left: 3px solid #e2a328; border-radius: 8px; background: #fff8e8; color: #5d5133; font-size: 8px; line-height: 1.45; }
+.react-dotogram-list { display: grid; gap: 4px; }
+.react-dotogram-list button {
+  display: grid; min-width: 0; grid-template-columns: 5px minmax(0,1fr) auto; gap: 6px; align-items: center;
+  padding: 6px 7px; border: 1px solid #e0e7ef; border-radius: 8px; background: #fbfcfe; color: #31475f; cursor: pointer; text-align: left;
+}
+.react-dotogram-list button:hover,
+.react-dotogram-list button.is-selected { border-color: #87aac9; background: #f1f6fb; }
+.react-dotogram-list i { width: 5px; height: 25px; border-radius: 99px; }
+.react-dotogram-list span { display: grid; min-width: 0; }
+.react-dotogram-list b { overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.react-dotogram-list small { overflow: hidden; color: #718096; font-size: 6.5px; text-overflow: ellipsis; white-space: nowrap; }
+.react-dotogram-list strong { color: #173f6c; font-size: 8px; }
+
+#viz .dotogram-point { cursor: pointer; transition: stroke-width .12s ease, opacity .12s ease; }
+#viz .dotogram-point:hover,
+#viz .dotogram-point:focus-visible { opacity: 1; stroke: #153f6d; stroke-width: 2.4px; outline: none; }
+#viz .dotogram-point.is-selected { opacity: 1; stroke: #f4b933; stroke-width: 3px; }
+
+@media (min-width: 2200px) {
+  .react-dotogram-choice button,
+  .react-dotogram-field select,
+  .react-dotogram-metrics b { font-size: 10.5px; }
+  .react-dotogram-selection h4 { font-size: 14px; }
+  .react-dotogram-primary strong { font-size: 28px; }
+  .react-dotogram-card { padding: 11px; }
+}
+
+body[data-motion="off"] .react-dotogram-inspector,
+body[data-motion="off"] #viz .dotogram-point { transition: none !important; animation: none !important; }

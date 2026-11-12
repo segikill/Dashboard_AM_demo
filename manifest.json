@@ -1,0 +1,16 @@
+{
+  "report": "index.html",
+  "edition": "demo",
+  "source_revision": "15f2c67",
+  "region": "Амурская область",
+  "year": 2025,
+  "visualizations": [
+    "map",
+    "infrastructure",
+    "treemap",
+    "heatmap",
+    "arrow",
+    "pyramid",
+    "dotogram"
+  ]
+}

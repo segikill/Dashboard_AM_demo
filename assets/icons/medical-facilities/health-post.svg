@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="title">
+  <title id="title">Здравпункт</title>
+  <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="7" fill="#64748B" stroke="#0F2740" stroke-opacity=".28" stroke-width=".75"/>
+  <path fill="#fff" d="M16 5.5 25 9v6.6c0 5.3-3.6 9.2-9 11.3-5.4-2.1-9-6-9-11.3V9l9-3.5Z"/>
+  <path fill="#64748B" d="M14.2 10h3.6v3.7h3.7v3.6h-3.7V21h-3.6v-3.7h-3.7v-3.6h3.7V10Z"/>
+</svg>

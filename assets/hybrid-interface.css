@@ -1,0 +1,673 @@
+:root {
+  --hybrid-inspector-w: 286px;
+  --hybrid-space-1: var(--ui-space-1);
+  --hybrid-space-2: var(--ui-space-2);
+  --hybrid-space-3: var(--ui-space-3);
+  --hybrid-space-4: var(--ui-space-4);
+  --hybrid-radius-sm: 8px;
+  --hybrid-radius-md: 12px;
+  --hybrid-shadow: 0 12px 34px rgba(20, 49, 75, .12);
+  --hybrid-motion-fast: 120ms;
+  --hybrid-motion-ui: 180ms;
+  --hybrid-ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+body.hybrid-ui {
+  --app-canvas: #f3f5f6;
+  --app-line: #d8dfe4;
+  --app-panel: #fff;
+}
+
+body.hybrid-ui .atlas-view-cache {
+  display: none !important;
+}
+
+/* The shell owns navigation and filters; the active workspace changes by task. */
+body.hybrid-ui .atlas-main .workspace {
+  background: var(--app-canvas);
+}
+
+body.hybrid-ui[data-workspace-mode="map"] .atlas-main .workspace {
+  background: var(--app-canvas);
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"] .atlas-main .content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--hybrid-inspector-w);
+  grid-template-rows: minmax(0, 1fr);
+  background: var(--app-canvas);
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"]:is([data-shell-view="treemap"], [data-shell-view="heatmap"]) .atlas-main .content {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.hybrid-ui .atlas-main .card {
+  min-width: 0;
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"] .atlas-main .card {
+  border-right: 1px solid var(--app-line);
+}
+
+/* Headings may wrap: truncation hid the meaning of several analytical views. */
+body.hybrid-ui[data-workspace-mode="analytics"] .atlas-main .card {
+  grid-template-rows: minmax(56px, auto) minmax(0, 1fr);
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"] .chart-head {
+  min-height: 56px;
+  align-items: flex-start;
+  padding: var(--ui-space-2) var(--ui-space-3);
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"] .chart-head > div:first-child {
+  align-content: center;
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"] .chart-head h2,
+body.hybrid-ui[data-workspace-mode="analytics"] .chart-head p {
+  overflow: visible;
+  max-width: none;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"] .chart-head h2 {
+  font-size: 15px;
+  line-height: 1.18;
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"] .chart-head p {
+  max-width: 720px;
+  margin-top: 2px;
+  font-size: 9px;
+  line-height: 1.28;
+}
+
+body.hybrid-ui .chart-head .chart-meta {
+  align-self: center;
+}
+
+.hybrid-chart-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--ui-space-2);
+  margin-left: auto;
+}
+
+.hybrid-action-button {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-1);
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border: 1px solid var(--ui-control-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--app-ink);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1;
+  transition: border-color var(--hybrid-motion-fast) ease,
+    background var(--hybrid-motion-fast) ease,
+    color var(--hybrid-motion-fast) ease,
+    transform var(--hybrid-motion-fast) ease;
+}
+
+.hybrid-action-button:hover {
+  border-color: #7ea6c8;
+  background: #f2f7fb;
+  color: #153f61;
+}
+
+.hybrid-action-button:active {
+  transform: translateY(1px);
+}
+
+.hybrid-action-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.75;
+  flex: 0 0 18px;
+}
+
+.hybrid-map-fullscreen {
+  margin-left: auto;
+}
+
+.mortality-map-toolbar .hybrid-map-fullscreen,
+.infra-map-toolbar .hybrid-map-fullscreen {
+  min-width: 31px;
+  padding: 6px 8px;
+}
+
+.mortality-map-toolbar .hybrid-map-fullscreen span,
+.infra-map-toolbar .hybrid-map-fullscreen span {
+  display: none;
+}
+
+/* Shared analytical context panel for non-map charts. */
+.hybrid-inspector {
+  position: relative;
+  z-index: 8;
+  display: none;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--app-panel);
+  box-shadow: none;
+}
+
+body.hybrid-ui[data-workspace-mode="analytics"]:not([data-shell-view="treemap"]):not([data-shell-view="heatmap"]) .hybrid-inspector {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.hybrid-inspector__head {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-2) var(--ui-space-3);
+  border-bottom: 1px solid var(--app-line);
+  background: var(--ui-surface-subtle);
+}
+
+.hybrid-inspector__head div {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.hybrid-inspector__head span {
+  color: #718399;
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.hybrid-inspector__head h3 {
+  overflow: hidden;
+  margin: 0;
+  color: #18334d;
+  font-size: 12.5px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hybrid-inspector__close {
+  display: none;
+  width: 29px;
+  height: 29px;
+  border: 1px solid #cbd8e4;
+  border-radius: 8px;
+  background: #fff;
+  color: #49657f;
+  cursor: pointer;
+}
+
+.hybrid-inspector__body {
+  min-height: 0;
+  padding: var(--ui-space-3);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #b7c6d4 transparent;
+  scrollbar-width: thin;
+}
+
+.hybrid-inspector__content {
+  display: grid;
+  gap: var(--ui-space-3);
+  animation: hybrid-panel-in var(--hybrid-motion-ui) var(--hybrid-ease) both;
+}
+
+.hybrid-inspector__section {
+  padding: var(--ui-space-3);
+  border: 1px solid var(--app-line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.hybrid-inspector__kicker {
+  display: block;
+  margin-bottom: var(--ui-space-2);
+  color: var(--app-muted);
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.hybrid-inspector__selection {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.hybrid-inspector__selection::before {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  margin-top: 4px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #2c7fa0;
+  box-shadow: 0 0 0 1px #74a5bb;
+  content: "";
+}
+
+.hybrid-inspector__selection h4 {
+  margin: 0;
+  color: #18334d;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.hybrid-inspector__selection p {
+  margin: 3px 0 0;
+  color: #718297;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.hybrid-inspector__primary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.hybrid-inspector__primary strong {
+  color: #0d3654;
+  font-size: clamp(22px, 1.6vw, 30px);
+  line-height: .95;
+  letter-spacing: -.035em;
+}
+
+.hybrid-inspector__primary span {
+  max-width: 96px;
+  color: #718297;
+  font-size: 8.5px;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.hybrid-inspector__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-2);
+}
+
+.hybrid-inspector__metric {
+  min-width: 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--ui-surface-subtle);
+}
+
+.hybrid-inspector__metric span {
+  display: block;
+  color: var(--app-muted);
+  font-size: 7.5px;
+  line-height: 1.2;
+}
+
+.hybrid-inspector__metric b {
+  display: block;
+  overflow: hidden;
+  margin-top: 3px;
+  color: #1d405e;
+  font-size: 11px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hybrid-inspector__metric b.is-positive {
+  color: #17845a;
+}
+
+.hybrid-inspector__metric b.is-negative {
+  color: #c24c59;
+}
+
+.hybrid-inspector__insight {
+  position: relative;
+  margin: 0;
+  padding-left: var(--ui-space-3);
+  color: #415a70;
+  font-size: 9.5px;
+  line-height: 1.45;
+  border-left: 2px solid var(--app-line);
+}
+
+.hybrid-inspector__insight::before {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  color: #d49218;
+  content: "✦";
+  display: none;
+}
+
+.hybrid-inspector__details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ui-space-1) var(--ui-space-2);
+  margin: 0;
+  font-size: 8.5px;
+}
+
+.hybrid-inspector__details dt {
+  min-width: 0;
+  color: #718297;
+}
+
+.hybrid-inspector__details dd {
+  margin: 0;
+  color: #233f59;
+  font-weight: 800;
+  text-align: right;
+}
+
+.hybrid-inspector__action {
+  width: 100%;
+  min-height: 34px;
+  padding: var(--ui-space-2) var(--ui-space-3);
+  border: 1px solid var(--app-blue);
+  border-radius: 8px;
+  background: var(--app-blue);
+  color: #fff;
+  cursor: pointer;
+  font-size: 9.5px;
+  font-weight: 850;
+  box-shadow: none;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.hybrid-inspector__action:hover { background: #205686; }
+.hybrid-inspector__action:active { transform: translateY(0); }
+
+.hybrid-inspector-toggle {
+  display: none;
+}
+
+/* Fullscreen keeps the current visual and its local context; it does not remount it. */
+.hybrid-fullscreen-target:fullscreen,
+.hybrid-fullscreen-target.is-fallback-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+}
+
+.hybrid-fullscreen-target.is-fallback-fullscreen {
+  position: fixed !important;
+  z-index: 1000 !important;
+  inset: 0 !important;
+}
+
+body:has(.hybrid-fullscreen-target.is-fallback-fullscreen) {
+  overflow: hidden !important;
+}
+
+.hybrid-fullscreen-target:fullscreen .viz,
+.hybrid-fullscreen-target.is-fallback-fullscreen .viz {
+  min-height: 0 !important;
+}
+
+body.hybrid-ui .viz-btn,
+body.hybrid-ui .drawer-inner,
+body.hybrid-ui .sidebar,
+body.hybrid-ui .mortality-map-side,
+body.hybrid-ui .infra-panel {
+  transition-timing-function: var(--hybrid-ease);
+}
+
+body.hybrid-ui .viz-btn.active {
+  transform: none;
+}
+
+body.hybrid-ui .viz-btn:focus-visible,
+body.hybrid-ui button:focus-visible,
+body.hybrid-ui select:focus-visible,
+body.hybrid-ui input:focus-visible {
+  outline: 2px solid var(--app-blue);
+  outline-offset: 2px;
+}
+
+@keyframes hybrid-panel-in {
+  from { opacity: 0; transform: translateX(7px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hybrid-view-in {
+  from { opacity: .72; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.hybrid-ui.hybrid-view-enter .viz > :first-child {
+  animation: hybrid-view-in var(--hybrid-motion-ui) var(--hybrid-ease) both;
+}
+
+@media (max-width: 1440px) {
+  :root {
+    --hybrid-inspector-w: 260px;
+  }
+
+  .hybrid-inspector__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .hybrid-inspector__metric {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .hybrid-inspector__metric b {
+    margin: 0;
+  }
+}
+
+@media (max-width: 1180px) {
+  body.hybrid-ui[data-workspace-mode="analytics"] .atlas-main .content {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.hybrid-ui[data-workspace-mode="analytics"] .hybrid-inspector {
+    position: absolute;
+    z-index: 25;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    width: min(300px, 35vw);
+    box-shadow: -10px 0 30px rgba(24, 54, 80, .16);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(102%);
+    transition: opacity var(--hybrid-motion-fast) ease, transform var(--hybrid-motion-ui) var(--hybrid-ease);
+  }
+
+  body.hybrid-ui.hybrid-inspector-open[data-workspace-mode="analytics"] .hybrid-inspector {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  .hybrid-inspector__close,
+  .hybrid-inspector-toggle {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 2200px) {
+  :root {
+    --hybrid-inspector-w: 336px;
+  }
+
+  body.hybrid-ui[data-workspace-mode="analytics"] .chart-head h2 {
+    font-size: 18px;
+  }
+
+  body.hybrid-ui[data-workspace-mode="analytics"] .chart-head p {
+    font-size: 11px;
+  }
+
+  .hybrid-inspector__head h3 {
+    font-size: 14px;
+  }
+
+  .hybrid-inspector__selection h4 {
+    font-size: 14px;
+  }
+
+  .hybrid-inspector__insight,
+  .hybrid-inspector__selection p {
+    font-size: 10.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hybrid-inspector__content,
+  body.hybrid-ui.hybrid-view-enter .viz > :first-child {
+    animation: none !important;
+  }
+}
+
+html[data-motion-mode="off"] .hybrid-inspector__content,
+html[data-motion-mode="off"] body.hybrid-ui.hybrid-view-enter .viz > :first-child {
+  animation: none !important;
+}
+
+/* Shared control chrome. Thematic fills, scales and facility symbols are intentionally scoped out. */
+body.hybrid-ui .viz-rail .viz-btn:hover {
+  background: var(--app-navy-2);
+  border-color: #698496;
+  transform: none;
+}
+body.hybrid-ui .viz-rail .viz-btn.active:hover { background: var(--app-blue); }
+body.hybrid-ui .atlas-main .local-controls .field {
+  background: var(--ui-surface-subtle);
+  border-color: var(--app-line);
+}
+body.hybrid-ui .seg button.active {
+  border-color: var(--app-blue);
+  background: var(--ui-accent-soft);
+  color: #205686;
+}
+body.hybrid-ui :is(.react-tree-levels, .treev2-levels) { padding: var(--ui-space-1); }
+body.hybrid-ui :is(.react-tree-controls, .treev2-controls) { gap: var(--ui-space-2); }
+body.hybrid-ui :is(.react-tree-levels button, .treev2-level-button).active,
+body.hybrid-ui :is(.react-tree-drill, .treev2-drill) {
+  background: var(--app-blue);
+  border-color: var(--app-blue);
+  box-shadow: none;
+}
+body.hybrid-ui :is(.react-tree-inspector, .treev2-inspector, .heatv2-inspector) {
+  background: var(--ui-surface-subtle);
+}
+.atlas-ui-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+body.hybrid-ui :is(.react-map-chrome, .react-infra-map-chrome) button,
+body.hybrid-ui :is(.react-map-inspector, .react-infra-panel-header) button,
+body.hybrid-ui .rail-drawer-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-1);
+}
+body.hybrid-ui .viz-rail .rail-drawer-toggle svg { color: inherit; }
+body.hybrid-ui .hybrid-inspector__close {
+  align-items: center;
+  justify-content: center;
+}
+body.hybrid-ui .hybrid-inspector__close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+}
+
+/* All six analytical views use the same control and inspector spacing. */
+body.hybrid-ui :is(.react-rank-controls, .react-pyramid-controls, .react-plot-controls, .react-dotogram-controls) {
+  gap: var(--ui-space-2);
+  padding-top: var(--ui-space-3);
+}
+body.hybrid-ui :is(.react-rank-card, .react-pyramid-card, .react-plot-card, .react-dotogram-card,
+  .react-tree-inspector-section, .treev2-inspector-section, .heatv2-inspector-card, .react-heatmap-card) {
+  padding: var(--ui-space-3);
+  border-color: var(--app-line);
+  border-radius: 8px;
+  box-shadow: none;
+}
+body.hybrid-ui :is(.hybrid-inspector__body, .treev2-inspector, .heatv2-inspector) { padding: var(--ui-space-3); }
+body.hybrid-ui :is(.react-rank-metrics, .react-pyramid-metrics, .react-plot-metrics, .react-dotogram-metrics) {
+  gap: var(--ui-space-2);
+}
+body.hybrid-ui :is(.react-rank-metrics, .react-pyramid-metrics, .react-plot-metrics, .react-dotogram-metrics) > div {
+  padding: var(--ui-space-2);
+  background: var(--ui-surface-subtle);
+}
+body.hybrid-ui :is(.react-rank-mode, .react-pyramid-mode, .react-plot-mode) button {
+  padding: var(--ui-space-2) var(--ui-space-1);
+}
+body.hybrid-ui :is(.react-rank-mode, .react-pyramid-mode, .react-plot-mode) button.is-active {
+  border-color: var(--app-blue);
+  background: var(--app-blue);
+  box-shadow: none;
+}
+body.hybrid-ui :is(.react-plot-choice, .react-dotogram-choice) button.is-active {
+  border-color: var(--app-blue);
+  background: var(--ui-accent-soft);
+  color: #205686;
+  box-shadow: none;
+}
+body.hybrid-ui :is(.treev2-pathbar, .heatv2-stage-head) {
+  padding: var(--ui-space-2) var(--ui-space-3);
+  background: var(--ui-surface-subtle);
+}
+body.hybrid-ui :is(.react-map-chrome, .react-infra-map-chrome) button {
+  min-height: 30px;
+}
+body.hybrid-ui .viz-rail :is(.viz-btn, .rail-drawer-toggle):focus-visible {
+  outline: 2px solid #b9d7ef;
+  outline-offset: 1px;
+}
+@media (max-width: 1540px) {
+  body.hybrid-ui .heatmap-v2-layout { grid-template-columns: minmax(0, 1fr) 272px; }
+}
+
+/* Matrix owns its selected-cell context, including at overlay breakpoints. */
+body.hybrid-ui:is([data-shell-view="heatmap"], [data-shell-view="treemap"]) :is(.hybrid-inspector, .hybrid-inspector-toggle) {
+  display: none;
+}
